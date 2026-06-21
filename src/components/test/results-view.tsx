@@ -2,8 +2,9 @@
 
 import { useMemo } from "react";
 import Link from "next/link";
+import { useState, useEffect } from "react";
 import type { TestAttempt, TestDefinition, Question } from "@/types";
-import { getTestDefinition, getQuestion } from "@/lib/store";
+import { getTestDefinition, getQuestion, getSavedQuestions, toggleSavedQuestion } from "@/lib/store";
 import { Card } from "@/components/ui/card";
 import { Heading, Body, Label } from "@/components/ui/typography";
 import { Badge } from "@/components/ui/badge";
@@ -11,6 +12,7 @@ import { Button } from "@/components/ui/button";
 import {
   CheckCircle, XCircle, MinusCircle, Clock, ChartBar,
   ArrowLeft, ArrowRight, Repeat,
+  BookmarkSimple, Bookmark,
 } from "@phosphor-icons/react/dist/ssr";
 
 interface ResultsViewProps {
@@ -20,6 +22,17 @@ interface ResultsViewProps {
 export function ResultsView({ attempt }: ResultsViewProps) {
   const testDef = getTestDefinition(attempt.testId);
   const questions = testDef ? testDef.questionIds.map(id => getQuestion(id)).filter(Boolean) as Question[] : [];
+
+  const [savedIds, setSavedIds] = useState<string[]>([]);
+
+  useEffect(() => {
+    setSavedIds(getSavedQuestions());
+  }, []);
+
+  const handleToggleSave = (qId: string) => {
+    const newState = toggleSavedQuestion(qId);
+    setSavedIds(prev => newState ? [...prev, qId] : prev.filter(id => id !== qId));
+  };
 
   const formatTime = (s: number) => {
     const m = Math.floor(s / 60);
@@ -120,6 +133,17 @@ export function ResultsView({ attempt }: ResultsViewProps) {
                     <div className="flex items-center gap-2 mb-0.5">
                       <span className="text-[11px] font-semibold text-text-muted">Q{idx + 1}.</span>
                       {isMarked && <Badge variant="accent" size="sm">Marked</Badge>}
+                      <button
+                        onClick={() => handleToggleSave(q.id)}
+                        className="ml-auto size-6 rounded-[4px] flex items-center justify-center hover:bg-text-primary/5 transition-colors"
+                        title={savedIds.includes(q.id) ? "Unsave question" : "Save question"}
+                      >
+                        {savedIds.includes(q.id) ? (
+                          <Bookmark size={12} weight="fill" className="text-brand-accent" />
+                        ) : (
+                          <BookmarkSimple size={12} weight="regular" className="text-text-muted" />
+                        )}
+                      </button>
                     </div>
                     <p className="text-[13px] font-medium text-text-primary">{q?.text}</p>
                     <div className="grid grid-cols-2 gap-x-4 gap-y-0.5 mt-1.5">

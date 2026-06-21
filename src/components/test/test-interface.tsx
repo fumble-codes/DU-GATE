@@ -3,7 +3,7 @@
 import { useState, useEffect, useCallback, useRef } from "react";
 import { useRouter } from "next/navigation";
 import type { Question, TestDefinition, TestAttempt } from "@/types";
-import { getQuestions, saveAttempt, submitAttempt } from "@/lib/store";
+import { getQuestions, saveAttempt, submitAttempt, getSavedQuestions, toggleSavedQuestion } from "@/lib/store";
 import { Button } from "@/components/ui/button";
 import { Heading, Body } from "@/components/ui/typography";
 import {
@@ -16,6 +16,8 @@ import {
   ArrowRight,
   PaperPlaneTilt,
   StopCircle,
+  BookmarkSimple,
+  Bookmark,
 } from "@phosphor-icons/react/dist/ssr";
 
 interface TestInterfaceProps {
@@ -32,6 +34,7 @@ export function TestInterface({ testDef }: TestInterfaceProps) {
   const [isSubmitted, setIsSubmitted] = useState(false);
   const attemptIdRef = useRef(`attempt-${Date.now()}-${Math.random().toString(36).slice(2, 7)}`);
   const startTimeRef = useRef(Date.now());
+  const [savedIds, setSavedIds] = useState<string[]>([]);
   const [attemptSaved, setAttemptSaved] = useState(false);
 
   const currentQ = questions[currentIdx];
@@ -39,6 +42,16 @@ export function TestInterface({ testDef }: TestInterfaceProps) {
   const answeredCount = Object.values(answers).filter(a => a !== null && a !== undefined).length;
   const markedCount = markedForReview.length;
   const unansweredCount = Object.keys(answers).filter(k => answers[k] === null || answers[k] === undefined).length;
+
+  /* Load saved questions */
+  useEffect(() => {
+    setSavedIds(getSavedQuestions());
+  }, []);
+
+  const handleToggleSave = (qId: string) => {
+    const newState = toggleSavedQuestion(qId);
+    setSavedIds(prev => newState ? [...prev, qId] : prev.filter(id => id !== qId));
+  };
 
   /* Save attempt on mount */
   useEffect(() => {
@@ -206,10 +219,21 @@ export function TestInterface({ testDef }: TestInterfaceProps) {
         {/* ── Question Area ── */}
         <div className="flex-1 flex flex-col overflow-hidden">
           <div className="flex-1 overflow-y-auto p-6">
-            <div className="mb-2">
+            <div className="flex items-center justify-between mb-2">
               <span className="text-[11px] font-semibold text-text-muted uppercase tracking-[0.06em]">
                 Q{currentIdx + 1}. {currentQ.chapter} · {currentQ.difficulty}
               </span>
+              <button
+                onClick={() => handleToggleSave(currentQ.id)}
+                className="size-7 rounded-[6px] flex items-center justify-center hover:bg-text-primary/5 transition-colors"
+                title={savedIds.includes(currentQ.id) ? "Unsave question" : "Save question"}
+              >
+                {savedIds.includes(currentQ.id) ? (
+                  <Bookmark size={14} weight="fill" className="text-brand-accent" />
+                ) : (
+                  <BookmarkSimple size={14} weight="regular" className="text-text-muted" />
+                )}
+              </button>
             </div>
             <p className="text-[16px] font-semibold text-text-primary leading-[1.6] mb-6">
               {currentQ.text}
