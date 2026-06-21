@@ -105,6 +105,8 @@ export default function DeckStudyPage({ params }: { params: Promise<{ deckId: st
           </Link>
           <div className="flex items-center gap-2">
             <Badge variant="neutral" size="sm">{deck.subject.toUpperCase()}</Badge>
+            {deck.shift && <Badge variant="accent" size="sm">Shift {deck.shift}</Badge>}
+            {deck.chapter && <Badge variant="accent" size="sm">{deck.chapter}</Badge>}
             {deck.date && <Badge variant="accent" size="sm">{deck.date}</Badge>}
           </div>
         </div>

@@ -86,6 +86,8 @@ export interface FlashcardDeck {
   cardCount: number;
   date?: string;
   exam?: string;
+  shift?: number;
+  chapter?: string;
   isPremium: boolean;
   freeCardCount: number;
 }
