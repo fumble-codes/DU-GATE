@@ -1,4 +1,4 @@
-import type { User, TestResult, Question, TestDefinition, TestAttempt, Subject } from "@/types";
+import type { User, TestResult, Question, TestDefinition, TestAttempt, Subject, FlashcardDeck, Flashcard } from "@/types";
 
 const P = "cuetpioneer";
 
@@ -188,6 +188,25 @@ export function removeErrorQuestion(id: string): void {
   setStore("errors", errors);
 }
 export function clearErrorQuestions(): void { setStore("errors", []); }
+
+/* ── Flashcards ── */
+export function getFlashcardDecks(): FlashcardDeck[] { return getStore<FlashcardDeck[]>("flashcard_decks") || []; }
+export function getFlashcardDeck(id: string): FlashcardDeck | undefined {
+  return getFlashcardDecks().find(d => d.id === id);
+}
+export function addFlashcardDecks(decks: FlashcardDeck[]): void {
+  setStore("flashcard_decks", [...getFlashcardDecks(), ...decks]);
+}
+export function getFlashcards(deckId?: string): Flashcard[] {
+  const all = getStore<Flashcard[]>("flashcards") || [];
+  return deckId ? all.filter(f => f.deckId === deckId) : all;
+}
+export function getFlashcard(id: string): Flashcard | undefined {
+  return getStore<Flashcard[]>("flashcards")?.find(f => f.id === id);
+}
+export function addFlashcards(cards: Flashcard[]): void {
+  setStore("flashcards", [...getFlashcards(), ...cards]);
+}
 
 /* ── Chapter Progress ── */
 export function getChapterProgress(): Record<string, number> {

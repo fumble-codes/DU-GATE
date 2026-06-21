@@ -84,6 +84,10 @@ export interface FlashcardDeck {
   title: string;
   subject: Subject;
   cardCount: number;
+  date?: string;
+  exam?: string;
+  isPremium: boolean;
+  freeCardCount: number;
 }
 
 export interface Flashcard {
@@ -91,6 +95,7 @@ export interface Flashcard {
   deckId: string;
   front: string;
   back: string;
+  backExtra?: string;
   difficulty?: Difficulty;
 }
 

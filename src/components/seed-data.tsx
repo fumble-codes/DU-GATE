@@ -1,13 +1,14 @@
 "use client";
 
 import { useEffect, useRef } from "react";
-import { addMockQuestions, addPyqQuestions, addTestDefinition } from "@/lib/store";
+import { addMockQuestions, addPyqQuestions, addTestDefinition, addFlashcardDecks, addFlashcards } from "@/lib/store";
 import { getTestDefinitions, clearAll } from "@/lib/store";
 import { mockQuestions } from "@/data/mock-questions";
 import { pyqQuestions } from "@/data/pyq-questions";
 import { allTestDefs } from "@/data/test-definitions";
+import { flashcardDecks, flashcards } from "@/data/flashcards";
 
-const DATA_VERSION = 4;
+const DATA_VERSION = 5;
 
 export function SeedData() {
   const seeded = useRef(false);
@@ -26,6 +27,8 @@ export function SeedData() {
     addMockQuestions(mockQuestions);
     addPyqQuestions(pyqQuestions);
     for (const def of allTestDefs) addTestDefinition(def);
+    addFlashcardDecks(flashcardDecks);
+    addFlashcards(flashcards);
     localStorage.setItem("cuetpioneer_version", String(DATA_VERSION));
 
     console.log("CUETPioneer: Data seeded successfully (v" + DATA_VERSION + ")");
