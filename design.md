@@ -27,7 +27,7 @@ The system uses design tokens for colors. To completely change the visual theme 
 ## 2. Typography & Hierarchy
 
 The interface relies strictly on variable font-weight and sizing scales to establish depth. 
-* **Target Font Families:** `Inter`, `SF Pro Display`, or `Plus Jakarta Sans`.
+* **Target Font Families:** `Inter` , `Plus Jakarta Sans`.
 
 ### Scale Matrix
 

@@ -2,7 +2,11 @@ export type Subject = "accountancy" | "business-studies" | "economics" | "englis
 
 export type Difficulty = "easy" | "medium" | "hard";
 
-export type TestType = "mock" | "pyq" | "chapter";
+export type TestType = "mock" | "pyq" | "practice";
+
+export type QuestionBank = "mock" | "pyq";
+
+export type PaletteStatus = "unseen" | "unanswered" | "answered" | "review";
 
 export interface Question {
   id: string;
@@ -13,8 +17,43 @@ export interface Question {
   subject: Subject;
   chapter: string;
   difficulty: Difficulty;
+  bank: QuestionBank;
   year?: number;
   source?: string;
+}
+
+export interface TestDefinition {
+  id: string;
+  title: string;
+  type: TestType;
+  subject: Subject;
+  year?: number;
+  shift?: number;
+  duration: number;
+  questionIds: string[];
+  totalMarks: number;
+  marksPerQuestion: number;
+  negativeMarking: number;
+  isPremium: boolean;
+  createdAt: string;
+}
+
+export interface TestAttempt {
+  id: string;
+  testId: string;
+  type: TestType;
+  title: string;
+  status: "in-progress" | "completed" | "reviewed";
+  startedAt: string;
+  submittedAt?: string;
+  answers: Record<string, number | null>;
+  markedForReview: string[];
+  score: number;
+  total: number;
+  correct: number;
+  incorrect: number;
+  skipped: number;
+  timeTaken: number;
 }
 
 export interface TestResult {
