@@ -110,7 +110,7 @@ export default function PyqPage() {
                         <div className="flex items-center gap-3 mt-2">
                           <div className="flex items-center gap-1.5">
                             <CalendarBlank size={13} weight="fill" className="text-text-muted" />
-                            <Body size="meta" muted>CUET {paper.year}</Body>
+                            <Body size="meta" muted>{paper.date ?? `CUET ${paper.year}`}</Body>
                           </div>
                           <div className="flex items-center gap-1.5">
                             <Building size={13} weight="fill" className="text-text-muted" />

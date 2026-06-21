@@ -57,6 +57,12 @@ export function getQuestions(ids: string[]): Question[] {
   return ids.map(id => map.get(id)).filter(Boolean) as Question[];
 }
 
+/* ── Clear all data ── */
+export function clearAll(): void {
+  const keys = Object.keys(localStorage).filter(k => k.startsWith(`${P}_`));
+  keys.forEach(k => localStorage.removeItem(k));
+}
+
 /* ── Test Definitions ── */
 export function getTestDefinitions(): TestDefinition[] { return getStore<TestDefinition[]>("tests") || []; }
 export function getTestDefinition(id: string): TestDefinition | undefined {

@@ -29,6 +29,7 @@ export interface TestDefinition {
   subject: Subject;
   year?: number;
   shift?: number;
+  date?: string;
   duration: number;
   questionIds: string[];
   totalMarks: number;
