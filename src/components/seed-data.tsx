@@ -8,7 +8,7 @@ import { pyqQuestions } from "@/data/pyq-questions";
 import { allTestDefs } from "@/data/test-definitions";
 import { flashcardDecks, flashcards } from "@/data/flashcards";
 
-const DATA_VERSION = 5;
+const DATA_VERSION = 6;
 
 export function SeedData() {
   const seeded = useRef(false);
