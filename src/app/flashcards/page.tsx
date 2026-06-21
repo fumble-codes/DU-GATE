@@ -13,7 +13,6 @@ import {
   GraduationCap,
   Stack,
   Sparkle,
-  LockKey,
   CalendarBlank,
 } from "@phosphor-icons/react/dist/ssr";
 
@@ -48,22 +47,8 @@ export default function FlashcardsPage() {
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 animate-in animate-in-delay-1">
           {decks.map((deck) => (
-            <Card key={deck.id} variant="interactive" className="relative overflow-hidden">
-              {deck.isPremium && (
-                <div className="absolute inset-0 bg-text-primary/[0.02] backdrop-blur-[1px] z-10 flex flex-col items-center justify-center gap-2">
-                  <div className="size-12 rounded-full bg-brand-accent/10 flex items-center justify-center">
-                    <LockKey size={24} weight="fill" className="text-brand-accent" />
-                  </div>
-                  <span className="text-[14px] font-bold text-text-primary">Premium Deck</span>
-                  <Body size="meta" muted className="text-center px-6">
-                    Unlock all cards to master this deck
-                  </Body>
-                  <Button size="sm" variant="primary" className="mt-1">
-                    Unlock Now
-                  </Button>
-                </div>
-              )}
-              <div className={`space-y-4 ${deck.isPremium ? "opacity-30" : ""}`}>
+            <Card key={deck.id} variant="interactive">
+              <div className="space-y-4">
                 <div className="flex items-start justify-between">
                   <div className="size-11 rounded-[10px] bg-brand-accent-subtle flex items-center justify-center">
                     <GraduationCap size={22} weight="fill" className="text-brand-accent-dark" />
