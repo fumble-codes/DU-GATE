@@ -11,6 +11,46 @@ export const flashcardDecks: FlashcardDeck[] = [
     isPremium: true,
     freeCardCount: 1,
   },
+  {
+    id: "acc-ch3",
+    title: "Accountancy — Partnership Basics",
+    subject: "accountancy",
+    cardCount: 30,
+    isPremium: true,
+    freeCardCount: 0,
+  },
+  {
+    id: "acc-ch4",
+    title: "Accountancy — Share Capital",
+    subject: "accountancy",
+    cardCount: 25,
+    isPremium: true,
+    freeCardCount: 0,
+  },
+  {
+    id: "bst-ch1",
+    title: "Business Studies — Management",
+    subject: "business-studies",
+    cardCount: 20,
+    isPremium: true,
+    freeCardCount: 0,
+  },
+  {
+    id: "bst-ch2",
+    title: "Business Studies — Principles",
+    subject: "business-studies",
+    cardCount: 22,
+    isPremium: true,
+    freeCardCount: 0,
+  },
+  {
+    id: "eco-ni",
+    title: "Economics — National Income",
+    subject: "economics",
+    cardCount: 18,
+    isPremium: true,
+    freeCardCount: 0,
+  },
 ];
 
 export const flashcards: Flashcard[] = [
