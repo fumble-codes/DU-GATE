@@ -7,7 +7,7 @@ import { mockQuestions } from "@/data/mock-questions";
 import { pyqQuestions } from "@/data/pyq-questions";
 import { allTestDefs } from "@/data/test-definitions";
 
-const DATA_VERSION = 3;
+const DATA_VERSION = 4;
 
 export function SeedData() {
   const seeded = useRef(false);
