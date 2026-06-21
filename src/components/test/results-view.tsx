@@ -31,6 +31,22 @@ export function ResultsView({ attempt }: ResultsViewProps) {
 
   return (
     <div className="space-y-6">
+      {/* Top navigation */}
+      <div className="flex items-center gap-2">
+        <Link href={attempt.type === "mock" ? "/mocks" : "/pyq"}>
+          <Button variant="outline" size="sm">
+            <ArrowLeft size={13} weight="bold" />
+            Back to {attempt.type === "mock" ? "Mocks" : "PYQ"}
+          </Button>
+        </Link>
+        <Link href="/dashboard">
+          <Button variant="outline" size="sm">
+            <ChartBar size={13} weight="fill" />
+            Dashboard
+          </Button>
+        </Link>
+      </div>
+
       {/* Score Hero */}
       <Card variant="default" className="relative overflow-hidden bg-topo">
         <div className="absolute top-0 right-0 w-48 h-48 bg-brand-accent/8 rounded-full -translate-y-1/3 translate-x-1/3 blur-3xl" />
@@ -137,21 +153,6 @@ export function ResultsView({ attempt }: ResultsViewProps) {
         </div>
       </Card>
 
-      {/* Actions */}
-      <div className="flex items-center justify-between">
-        <Link href={attempt.type === "mock" ? "/mocks" : "/pyq"}>
-          <Button variant="outline" size="sm">
-            <ArrowLeft size={13} weight="bold" />
-            Back to {attempt.type === "mock" ? "Mocks" : "PYQ"}
-          </Button>
-        </Link>
-        <Link href="/dashboard">
-          <Button variant="primary" size="sm">
-            Dashboard
-            <ChartBar size={13} weight="fill" />
-          </Button>
-        </Link>
-      </div>
     </div>
   );
 }
