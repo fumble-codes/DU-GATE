@@ -47,12 +47,12 @@ export function Sidebar() {
           href="/dashboard"
           className="flex items-center gap-2.5 group"
         >
-          <div className="size-9 rounded-[10px] bg-brand-accent flex items-center justify-center text-white font-extrabold text-[16px] tracking-tight shadow-glow transition-transform duration-200 group-hover:scale-105">
-            P
+          <div className="size-9 rounded-[10px] bg-brand-accent flex items-center justify-center shadow-glow transition-transform duration-200 group-hover:scale-105">
+            <img src="/logo.svg" alt="DUGATE" className="size-6" />
           </div>
           <div>
             <span className="text-[17px] font-bold text-text-primary leading-none block">
-              CUETPioneer
+              DUGATE
             </span>
             <span className="text-[10px] font-semibold uppercase tracking-[0.12em] text-brand-accent">
               Exam Prep

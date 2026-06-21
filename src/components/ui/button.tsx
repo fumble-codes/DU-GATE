@@ -13,6 +13,7 @@ const buttonVariants = cva(
         success: "bg-status-success text-white hover:bg-status-success/90 active:scale-[0.98]",
         alert: "bg-status-alert text-white hover:bg-status-alert/90 active:scale-[0.98]",
         subtle: "bg-brand-accent-subtle text-brand-accent-dark hover:bg-brand-accent/20 active:scale-[0.98]",
+        pop: "bg-brand-pop text-white hover:bg-brand-pop-dark active:scale-[0.98]",
       },
       size: {
         sm: "text-[13px] px-4 py-2 gap-1.5",

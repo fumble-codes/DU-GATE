@@ -11,9 +11,10 @@ const plusJakarta = Plus_Jakarta_Sans({
 });
 
 export const metadata: Metadata = {
-  title: "CUETPioneer - CUET Exam Preparation",
+  title: "DUGATE - CUET Exam Preparation",
   description:
     "Comprehensive CUET exam preparation platform with mock tests, PYQ bank, chapter practice, and performance analysis.",
+  icons: [{ rel: "icon", url: "/logo.svg" }],
 };
 
 export default function RootLayout({

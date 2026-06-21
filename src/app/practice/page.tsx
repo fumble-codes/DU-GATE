@@ -97,7 +97,7 @@ export default function PracticePage() {
                 <Button
                   size="sm"
                   className="w-full"
-                  variant={ch.progress > 0 ? "accent" : "outline"}
+                  variant={ch.progress > 0 ? "pop" : "outline"}
                 >
                   {ch.progress > 0 ? "Continue Practice" : "Start Practice"}
                 </Button>

@@ -10,7 +10,8 @@ const badgeVariants = cva(
         alert: "bg-status-alert-light text-status-alert",
         accent: "bg-brand-accent-subtle text-brand-accent-dark",
         neutral: "bg-text-primary/5 text-text-muted",
-        gold: "bg-brand-accent/10 text-brand-accent-dark",
+        pop: "bg-brand-pop-subtle text-brand-pop-dark",
+        gold: "bg-brand-pop-subtle text-brand-pop-dark",
       },
       size: {
         sm: "text-[11px] px-2.5 py-1",
@@ -47,7 +48,7 @@ export function Badge({
 export function StatusDot({
   variant = "success",
 }: {
-  variant?: "success" | "alert" | "accent" | "gold";
+  variant?: "success" | "alert" | "accent" | "pop" | "gold";
 }) {
   return (
     <span
@@ -56,8 +57,8 @@ export function StatusDot({
           ? "bg-status-success"
           : variant === "alert"
           ? "bg-status-alert"
-          : variant === "gold"
-          ? "bg-brand-accent"
+          : variant === "pop" || variant === "gold"
+          ? "bg-brand-pop"
           : "bg-brand-accent-dark"
       }`}
     />

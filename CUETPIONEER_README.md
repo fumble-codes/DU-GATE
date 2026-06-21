@@ -17,13 +17,13 @@
 **CUETPioneer** is a comprehensive CUET (Common University Entrance Test) exam preparation platform designed specifically for Commerce students preparing for the exam. It provides mock tests, past-year questions, chapter-wise practice, flashcards, and analysis tools — all in a single, self-contained HTML application.
 
 ### Key Highlights
-- ✅ **Single-file application** — No installation or backend required
+
 - ✅ **50+ questions per mock** — Full-length realistic practice tests
 - ✅ **21 Government papers** — Official CUET 2025 papers
 - ✅ **13 chapters** — Complete Accountancy coverage
 - ✅ **Real-time scoring** — Instant results and explanations
 - ✅ **Progress tracking** — Track your preparation journey
-- ✅ **Offline capable** — Works locally without internet dependency
+
 
 ---
 

@@ -17,7 +17,7 @@ export function SeedData() {
     if (seeded.current) return;
     seeded.current = true;
 
-    const version = parseInt(localStorage.getItem("cuetpioneer_version") || "0", 10);
+    const version = parseInt(localStorage.getItem("dugate_version") || "0", 10);
     if (version >= DATA_VERSION) {
       const existing = getTestDefinitions();
       if (existing.length > 0) return;
@@ -29,9 +29,9 @@ export function SeedData() {
     for (const def of allTestDefs) addTestDefinition(def);
     addFlashcardDecks(flashcardDecks);
     addFlashcards(flashcards);
-    localStorage.setItem("cuetpioneer_version", String(DATA_VERSION));
+    localStorage.setItem("dugate_version", String(DATA_VERSION));
 
-    console.log("CUETPioneer: Data seeded successfully (v" + DATA_VERSION + ")");
+    console.log("DUGATE: Data seeded successfully (v" + DATA_VERSION + ")");
   }, []);
 
   return null;

@@ -29,9 +29,9 @@ export function removeItem(key: string): void {
 }
 
 export const STORAGE_KEYS = {
-  USERS: "cuetpioneer_users",
-  SESSION: "cuetpioneer_session",
-  SAVED_QUESTIONS: "cuetpioneer_saved",
-  TEST_RESULTS: "cuetpioneer_results",
-  PROGRESS: "cuetpioneer_progress",
+  USERS: "dugate_users",
+  SESSION: "dugate_session",
+  SAVED_QUESTIONS: "dugate_saved",
+  TEST_RESULTS: "dugate_results",
+  PROGRESS: "dugate_progress",
 } as const;

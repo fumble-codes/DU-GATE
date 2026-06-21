@@ -33,9 +33,9 @@ const recentActivity = [
 
 const subjectData = [
   { subject: "Accountancy", accuracy: 72, color: "bg-brand-accent", label: "Strong" as const },
-  { subject: "Business Studies", accuracy: 65, color: "bg-status-success", label: "Good" as const },
+  { subject: "Business Studies", accuracy: 65, color: "bg-brand-accent", label: "Good" as const },
   { subject: "Economics", accuracy: 58, color: "bg-brand-accent", label: "Needs Work" as const },
-  { subject: "English", accuracy: 82, color: "bg-text-primary", label: "Excellent" as const },
+  { subject: "English", accuracy: 82, color: "bg-brand-accent", label: "Excellent" as const },
 ];
 
 const weakTopics = [
@@ -108,8 +108,8 @@ function RadialProgress({ percent, size = 82, className }: { percent: number; si
     <svg width={size} height={size} viewBox={`0 0 ${size} ${size}`} className={className}>
       <defs>
         <linearGradient id="bar-grad" x1="0" y1="0" x2="1" y2="1">
-          <stop offset="0%" stopColor="#D4A043" />
-          <stop offset="100%" stopColor="#E8C87A" />
+          <stop offset="0%" stopColor="currentColor" className="text-brand-pop" stopOpacity="1" />
+          <stop offset="100%" stopColor="currentColor" className="text-brand-pop-light" stopOpacity="1" />
         </linearGradient>
       </defs>
       <circle cx={half} cy={half} r={radius} fill="none" stroke="currentColor" className="text-text-primary/8" strokeWidth={strokeWidth} />
@@ -168,22 +168,22 @@ export default function DashboardPage() {
             </div>
             <div className="border-t border-border" />
             <div className="grid grid-cols-2 gap-4 pt-4 pb-3">
-              <div>
-                <p className="text-[36px] font-bold leading-[1.0] tracking-[-0.02em] text-text-primary">
+              <div className="bg-surface-elevated rounded-card p-3">
+                <p className="text-[36px] font-black leading-[1.0] tracking-[-0.02em] text-text-primary">
                   68<span className="text-[20px] text-text-muted">%</span>
                 </p>
                 <p className="text-[13px] font-semibold text-text-secondary mt-0.5">
                   Overall Accuracy — <span className="text-status-success">↑ 5%</span>
                 </p>
               </div>
-              <div>
-                <p className="text-[32px] md:text-[36px] font-bold leading-[0.9] tracking-[-0.02em] text-text-primary">
+              <div className="bg-surface-elevated rounded-card p-3">
+                <p className="text-[32px] md:text-[36px] font-black leading-[0.9] tracking-[-0.02em] text-text-primary">
                   {daysLeft}
                 </p>
                 <p className="text-[11px] font-semibold text-text-secondary mt-0.5 uppercase tracking-[0.08em]">
                   days until CUET UG 2027
                 </p>
-                <div className="mt-2 h-1.5 rounded-full bg-text-primary/5 overflow-hidden">
+                <div className="mt-2 h-2.5 rounded-full bg-text-primary/5 overflow-hidden">
                   <div className="h-full rounded-full bg-brand-accent" style={{ width: `${Math.min(100, Math.max(0, 100 - daysLeft / 3.65))}%` }} />
                 </div>
               </div>
@@ -196,8 +196,8 @@ export default function DashboardPage() {
                   <Body size="meta">12 tests</Body>
                 </div>
                 <div className="flex items-center gap-1.5">
-                  <Fire size={13} weight="fill" className="text-status-alert" />
-                  <Body size="meta">7d streak</Body>
+                  <Fire size={13} weight="fill" className="text-brand-pop" />
+                  <Body size="meta" className="text-brand-pop font-extrabold">7d streak</Body>
                 </div>
                 <div className="flex items-center gap-1.5">
                   <Books size={13} weight="fill" className="text-status-success" />
@@ -234,7 +234,7 @@ export default function DashboardPage() {
                     <Badge variant={s.label === "Excellent" ? "success" : s.label === "Strong" ? "accent" : "neutral"} size="sm">{s.label}</Badge>
                   </div>
                 </div>
-                <div className="h-1 rounded-full bg-text-primary/5 overflow-hidden">
+                <div className="h-2.5 rounded-full bg-text-primary/5 overflow-hidden">
                   <div className={`h-full rounded-full ${s.color}`} style={{ width: `${s.accuracy}%` }} />
                 </div>
               </div>
@@ -243,25 +243,25 @@ export default function DashboardPage() {
         </Card>
 
         {/* ══ Best Score — col 3, row 2, radial bar at top covering ~35% vertical ══ */}
-        <Card variant="default" className="flex flex-col items-center justify-center gap-2 pt-5 pb-4">
+        <Card variant="default" className="border-l-2 border-l-brand-pop flex flex-col items-center justify-center gap-2 pt-5 pb-4">
           <div className="flex-1 flex items-center justify-center">
             <RadialProgress percent={74} size={82} className="shrink-0" />
           </div>
           <div className="text-center">
             <Label>Best Score</Label>
             <div className="flex items-center gap-2 mt-0.5 justify-center">
-              <span className="text-[20px] font-bold text-text-primary leading-none">185 / 250</span>
-              <Badge variant="success" size="sm">NEW PB</Badge>
+                  <span className="text-[20px] font-black text-text-primary leading-none">185 / 250</span>
+              <Badge variant="pop" size="sm">NEW PB</Badge>
             </div>
             <Body size="meta" muted className="text-[11px] mt-0.5">Mock Test #12 · 74% accuracy</Body>
           </div>
         </Card>
 
         {/* ══ Daily Tip — col 4, row 1 ══ */}
-        <Card variant="default" className="border border-dashed border-brand-accent/25">
+        <Card variant="default" className="border border-dashed border-brand-pop/25">
           <div className="flex items-start gap-2.5">
-            <div className="size-8 rounded-[8px] bg-brand-accent/10 flex items-center justify-center shrink-0">
-              <Lightbulb size={16} weight="fill" className="text-brand-accent" />
+            <div className="size-8 rounded-[8px] bg-brand-pop/10 flex items-center justify-center shrink-0">
+              <Lightbulb size={16} weight="fill" className="text-brand-pop" />
             </div>
             <div className="min-w-0">
               <Label>Today&apos;s Focus</Label>
@@ -290,7 +290,7 @@ export default function DashboardPage() {
         </Card>
 
         {/* ══ Recent Activity — col-span-4 full width ══ */}
-        <Card padding="list" variant="default" className="md:col-span-4">
+        <Card padding="list" variant="default" className="border-l-2 border-l-brand-accent md:col-span-4">
           <div className="flex items-center justify-between mb-3">
             <Heading as="h5">Recent Activity</Heading>
             <Badge variant="accent" size="sm">Last 7 days</Badge>
@@ -304,7 +304,7 @@ export default function DashboardPage() {
                 </div>
                 <Body size="meta">{item.title}</Body>
                 <div className="flex items-center gap-2 mt-0.5">
-                  <span className="text-[14px] font-bold text-text-primary">{item.score}</span>
+                  <span className="text-[14px] font-black text-text-primary">{item.score}</span>
                   <span className="text-[10px] font-semibold text-text-muted">{item.acc}% acc</span>
                 </div>
               </div>
@@ -332,7 +332,7 @@ export default function DashboardPage() {
                   <Body size="meta">{t.topic}</Body>
                   <span className="text-[11px] font-bold text-status-alert">{t.acc}%</span>
                 </div>
-                <div className="h-1.5 rounded-full bg-text-primary/5 overflow-hidden">
+                <div className="h-2.5 rounded-full bg-text-primary/5 overflow-hidden">
                   <div className={`h-full rounded-full ${t.bar}`} style={{ width: `${t.acc}%` }} />
                 </div>
               </div>
@@ -344,10 +344,10 @@ export default function DashboardPage() {
         </Card>
 
         {/* ══ Next Target — col 2-3, row 4 (wider) ══ */}
-        <Card variant="default" className="md:col-span-2 flex items-center justify-between">
+        <Card variant="default" className="border-l-2 border-l-brand-pop md:col-span-2 flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <div className="size-10 rounded-[10px] bg-brand-accent-subtle flex items-center justify-center shrink-0">
-              <Rocket size={20} weight="fill" className="text-brand-accent-dark" />
+            <div className="size-10 rounded-[10px] bg-brand-pop-subtle flex items-center justify-center shrink-0">
+              <Rocket size={20} weight="fill" className="text-brand-pop-dark" />
             </div>
             <div>
               <Label>Next Target</Label>
@@ -355,7 +355,7 @@ export default function DashboardPage() {
               <Body size="meta" muted className="text-[11px]">Beat your personal best</Body>
             </div>
           </div>
-          <Button size="sm" variant="accent" shape="pill">
+          <Button size="sm" variant="pop" shape="pill">
             <Target size={12} weight="fill" />
             Go for it
           </Button>
@@ -367,11 +367,11 @@ export default function DashboardPage() {
             {stats.map((stat) => (
               <div key={stat.label} className="flex items-center justify-between py-2 first:pt-0 last:pb-0">
                 <div className="flex items-center gap-1.5">
-                  <stat.icon size={11} weight="fill" className="text-brand-accent" />
+                  <stat.icon size={11} weight="fill" className={stat.label === "Streak" ? "text-brand-pop" : "text-brand-accent"} />
                   <Body size="meta">{stat.label}</Body>
                 </div>
                 <div className="flex items-center gap-1">
-                  <span className="text-[13px] font-bold text-text-primary">{stat.value}</span>
+                  <span className="text-[13px] font-black text-text-primary">{stat.value}</span>
                   {stat.up
                     ? <TrendUp size={9} weight="fill" className="text-status-success" />
                     : <TrendDown size={9} weight="fill" className="text-status-alert" />

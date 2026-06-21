@@ -4,7 +4,7 @@ import { cn } from "@/lib/utils";
 const cardVariants = cva("bg-surface-card rounded-card border border-border transition-all duration-200", {
   variants: {
     variant: {
-      default: "shadow-card",
+      default: "shadow-card hover:shadow-card-hover hover:border-border-hover",
       elevated: "shadow-card-hover",
       interactive:
         "shadow-card hover:shadow-card-hover hover:border-border-hover cursor-pointer",
@@ -28,6 +28,7 @@ interface CardProps extends VariantProps<typeof cardVariants> {
   children: React.ReactNode;
   className?: string;
   as?: "div" | "section" | "article";
+  onClick?: React.MouseEventHandler<HTMLDivElement>;
 }
 
 export function Card({
@@ -36,9 +37,10 @@ export function Card({
   padding,
   className,
   children,
+  ...props
 }: CardProps) {
   return (
-    <Tag className={cn(cardVariants({ variant, padding }), className)}>
+    <Tag className={cn(cardVariants({ variant, padding }), className)} {...props}>
       {children}
     </Tag>
   );

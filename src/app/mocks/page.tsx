@@ -64,8 +64,8 @@ export default function MocksPage() {
               <Card key={test.id} variant={test.isPremium ? "default" : "interactive"} className="relative overflow-hidden">
                 {test.isPremium && (
                   <div className="absolute inset-0 bg-text-primary/[0.02] backdrop-blur-[1px] z-10 flex flex-col items-center justify-center gap-2">
-                    <div className="size-12 rounded-full bg-brand-accent/10 flex items-center justify-center">
-                      <LockKey size={24} weight="fill" className="text-brand-accent" />
+                    <div className="size-12 rounded-full bg-brand-pop/10 flex items-center justify-center">
+                      <LockKey size={24} weight="fill" className="text-brand-pop" />
                     </div>
                     <span className="text-[14px] font-bold text-text-primary">Coming Soon</span>
                     <Body size="meta" muted className="text-center px-6">
@@ -98,7 +98,7 @@ export default function MocksPage() {
                   <Button
                     size="sm"
                     className="w-full"
-                    variant={best ? "accent" : "primary"}
+                    variant={best ? "pop" : "primary"}
                     onClick={() => router.push(`/mocks/test/${test.id}`)}
                   >
                     <PlayCircle size={14} weight="fill" />

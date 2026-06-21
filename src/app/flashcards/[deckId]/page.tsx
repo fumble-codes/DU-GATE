@@ -94,7 +94,7 @@ export default function DeckStudyPage({ params }: { params: Promise<{ deckId: st
   };
 
   return (
-    <div className="min-h-screen bg-[#F6F4F0] flex flex-col">
+    <div className="min-h-screen bg-canvas-bg flex flex-col">
       {/* Top bar */}
       <div className="sticky top-0 z-20 bg-white/80 backdrop-blur-md border-b border-border">
         <div className="max-w-lg mx-auto px-4 h-14 flex items-center justify-between">

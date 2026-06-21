@@ -1,6 +1,6 @@
 import type { User, TestResult, Question, TestDefinition, TestAttempt, Subject, FlashcardDeck, Flashcard } from "@/types";
 
-const P = "cuetpioneer";
+const P = "dugate";
 
 function getStore<T>(key: string): T | null {
   if (typeof window === "undefined") return null;

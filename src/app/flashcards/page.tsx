@@ -105,8 +105,8 @@ export default function FlashcardsPage() {
             <Card key={deck.id} variant={isLocked ? "default" : "interactive"} className="relative overflow-hidden">
               {isLocked && (
                 <div className="absolute inset-0 bg-text-primary/[0.02] backdrop-blur-[1px] z-10 flex flex-col items-center justify-center gap-2">
-                  <div className="size-12 rounded-full bg-brand-accent/10 flex items-center justify-center">
-                    <LockKey size={24} weight="fill" className="text-brand-accent" />
+                  <div className="size-12 rounded-full bg-brand-pop/10 flex items-center justify-center">
+                    <LockKey size={24} weight="fill" className="text-brand-pop" />
                   </div>
                   <span className="text-[14px] font-bold text-text-primary">Premium Deck</span>
                   <Body size="meta" muted className="text-center px-6">
@@ -122,7 +122,7 @@ export default function FlashcardsPage() {
                   <div className="size-11 rounded-[10px] bg-brand-accent-subtle flex items-center justify-center">
                     <GraduationCap size={22} weight="fill" className="text-brand-accent-dark" />
                   </div>
-                  <Badge variant="accent" size="sm">{isLocked ? "Premium" : "Free"}</Badge>
+                  <Badge variant={isLocked ? "pop" : "accent"} size="sm">{isLocked ? "Premium" : "Free"}</Badge>
                 </div>
                 <div>
                   <Heading as="h5">{deck.title}</Heading>

@@ -125,7 +125,7 @@ export default function PyqPage() {
                           </Badge>
                           <Body size="meta" muted>{paper.questionIds.length}Q</Body>
                         </div>
-                        <Button size="sm" variant={isCompleted ? "accent" : "primary"} onClick={() => router.push(`/pyq/test/${paper.id}`)}>
+                        <Button size="sm" variant={isCompleted ? "pop" : "primary"} onClick={() => router.push(`/pyq/test/${paper.id}`)}>
                           <PlayCircle size={13} weight="fill" />
                           {isCompleted ? "Retake" : "Attempt"}
                         </Button>
