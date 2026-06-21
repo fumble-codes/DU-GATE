@@ -8,8 +8,8 @@ export const flashcardDecks: FlashcardDeck[] = [
     cardCount: 12,
     date: "14 May 2025",
     exam: "CUET 2025 Shift 2",
-    isPremium: true,
-    freeCardCount: 1,
+    isPremium: false,
+    freeCardCount: 12,
   },
   {
     id: "acc-ch3",
