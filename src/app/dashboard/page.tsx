@@ -242,13 +242,13 @@ export default function DashboardPage() {
           </div>
         </Card>
 
-        {/* ══ Best Score — col 3, row 2, radial bar at top covering ~35% vertical ══ */}
+        {/* ══ Score Analysis — col 3, row 2, radial bar at top covering ~35% vertical ══ */}
         <Card variant="default" className="border-l-2 border-l-brand-pop flex flex-col items-center justify-center gap-2 pt-5 pb-4">
           <div className="flex-1 flex items-center justify-center">
             <RadialProgress percent={74} size={82} className="shrink-0" />
           </div>
           <div className="text-center">
-            <Label>Best Score</Label>
+            <Label>Score Analaysis</Label>
             <div className="flex items-center gap-2 mt-0.5 justify-center">
                   <span className="text-[20px] font-black text-text-primary leading-none">185 / 250</span>
               <Badge variant="pop" size="sm">NEW PB</Badge>

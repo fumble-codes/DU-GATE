@@ -11,6 +11,7 @@ import {
   GraduationCap,
   FileText,
   ChartLineUp,
+  Chalkboard,
   Question,
   Books,
   Calculator,
@@ -33,6 +34,7 @@ const navItems: NavItem[] = [
   { label: "Flashcards", href: "/flashcards", icon: GraduationCap },
   { label: "NCERT Notes", href: "/notes", icon: FileText },
   { label: "Analysis", href: "/analysis", icon: ChartLineUp },
+  { label: "Council", href: "/council", icon: Chalkboard },
   { label: "Ask a Doubt", href: "/doubt", icon: Question },
   { label: "Question Library", href: "/library", icon: Books },
   { label: "College Predictor", href: "/college-predictor", icon: Calculator },
@@ -49,9 +51,7 @@ export function Sidebar() {
           href="/dashboard"
           className="flex items-center gap-2.5 group"
         >
-          <div className="size-9 rounded-[10px] bg-brand-accent flex items-center justify-center shadow-glow transition-transform duration-200 group-hover:scale-105">
-            <img src="/logo.svg" alt="DUGATE" className="size-6" />
-          </div>
+          <img src="/logo.svg" alt="DUGATE" className="size-9 transition-transform duration-200 group-hover:scale-105" />
           <div>
             <span className="text-[17px] font-bold text-text-primary leading-none block">
               DUGATE
