@@ -1,0 +1,33 @@
+import { AdminBreadcrumbs } from "@/components/admin/admin-breadcrumbs";
+import { Card } from "@/components/ui/card";
+import { Heading, Body, Label } from "@/components/ui/typography";
+import { Gear } from "@phosphor-icons/react/dist/ssr";
+
+export default function SettingsPage() {
+  return (
+    <div className="space-y-8">
+      <div>
+        <AdminBreadcrumbs
+          items={[{ label: "Admin", href: "/admin" }, { label: "Settings" }]}
+        />
+        <Heading as="h1" className="mt-1">
+          Settings
+        </Heading>
+        <Body size="meta" muted className="mt-1">
+          System configuration — read-only for now.
+        </Body>
+      </div>
+
+      <Card variant="default" className="p-12 flex flex-col items-center justify-center text-center">
+        <div className="size-12 rounded-xl bg-brand-accent-subtle flex items-center justify-center mb-4">
+          <Gear size={24} weight="fill" className="text-brand-accent-dark" />
+        </div>
+        <Heading as="h5">Coming in Future Phases</Heading>
+        <Body size="meta" muted className="mt-2 max-w-md">
+          Settings will display system configuration, environment info, and
+          database status.
+        </Body>
+      </Card>
+    </div>
+  );
+}

@@ -33,6 +33,18 @@ export async function middleware(request: NextRequest) {
     return NextResponse.redirect(new URL("/auth/login", request.url));
   }
 
+  if (isProtected && session) {
+    const { data: profile } = await supabase
+      .from("profiles")
+      .select("role")
+      .eq("id", session.user.id)
+      .single();
+
+    if (!profile || profile.role !== "ADMIN") {
+      return NextResponse.redirect(new URL("/403", request.url));
+    }
+  }
+
   if (isAuth && session) {
     return NextResponse.redirect(new URL("/", request.url));
   }

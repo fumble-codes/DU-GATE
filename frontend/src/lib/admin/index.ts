@@ -1,0 +1,1 @@
+export { verifyAdmin } from "./guard";
