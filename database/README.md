@@ -4,7 +4,26 @@ PostgreSQL schema for Dugate's Question Bank.
 
 ## Files
 
-- `schema.sql` — Production schema: tables, enums, constraints, indexes, triggers
+- `schema.sql` — Production schema: tables, enums, constraints, 
+indexes, triggers
+
+# Database
+
+## schema.sql
+
+Creates the production database.
+
+Run once.
+
+## seed.sql
+
+Seeds lookup data.
+
+Can safely be re-run.
+
+Questions are NOT inserted here.
+
+Questions come from the parser.
 
 ## Conventions
 

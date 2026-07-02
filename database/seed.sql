@@ -1,0 +1,2 @@
+-- Seed data for Question Bank
+-- Run after schema.sql
