@@ -25,13 +25,24 @@ function LoginForm() {
 
     const { error: err } = await supabase.auth.signInWithPassword({ email, password });
     if (err) {
-      setError(err.message);
+      setError(
+        err.message === "Invalid login credentials"
+          ? "Check your email for a confirmation link, or try again."
+          : err.message
+      );
       setLoading(false);
       return;
     }
 
     router.push(redirectTo);
     router.refresh();
+  };
+
+  const handleGoogleSignIn = async () => {
+    await supabase.auth.signInWithOAuth({
+      provider: "google",
+      options: { redirectTo: `${window.location.origin}/auth/callback` },
+    });
   };
 
   return (
@@ -74,13 +85,31 @@ function LoginForm() {
         </Button>
       </form>
 
-      <Body size="meta" className="text-center mt-4">
-        Don't have an account?{" "}
-        <Link href="/auth/signup" className="text-brand-accent font-semibold hover:underline">
-          Sign up
-        </Link>
-      </Body>
-    </Card>
+        <div className="relative my-4">
+          <div className="absolute inset-0 flex items-center">
+            <div className="w-full border-t border-border" />
+          </div>
+          <div className="relative flex justify-center text-xs">
+            <Meta className="bg-canvas-bg px-2">or continue with</Meta>
+          </div>
+        </div>
+
+        <Button
+          type="button"
+          variant="outline"
+          className="w-full"
+          onClick={handleGoogleSignIn}
+        >
+          Continue with Google
+        </Button>
+
+        <Body size="meta" className="text-center mt-4">
+          Don't have an account?{" "}
+          <Link href="/auth/signup" className="text-brand-accent font-semibold hover:underline">
+            Sign up
+          </Link>
+        </Body>
+      </Card>
   );
 }
 

@@ -1,7 +1,6 @@
 "use client";
 
 import { useState } from "react";
-import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { createClient } from "@/lib/db/supabase-browser";
 import { Card } from "@/components/ui/card";
@@ -9,12 +8,12 @@ import { Heading, Body, Meta, Label } from "@/components/ui/typography";
 import { Button } from "@/components/ui/button";
 
 export default function SignupPage() {
-  const router = useRouter();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [username, setUsername] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
+  const [submitted, setSubmitted] = useState(false);
   const supabase = createClient();
 
   const handleSignup = async (e: React.FormEvent) => {
@@ -22,10 +21,13 @@ export default function SignupPage() {
     setError("");
     setLoading(true);
 
-    const { data, error: err } = await supabase.auth.signUp({
+    const { error: err } = await supabase.auth.signUp({
       email,
       password,
-      options: { data: { username } },
+      options: {
+        data: { username },
+        emailRedirectTo: `${window.location.origin}/auth/callback`,
+      },
     });
     if (err) {
       setError(err.message);
@@ -33,17 +35,48 @@ export default function SignupPage() {
       return;
     }
 
-    if (data.user) {
-      await supabase.from("profiles").insert({
-        id: data.user.id,
-        username,
-        is_teacher: false,
-      });
-    }
-
-    router.push("/auth/login?verified=true");
-    router.refresh();
+    setSubmitted(true);
+    setLoading(false);
   };
+
+  const handleGoogleSignIn = async () => {
+    await supabase.auth.signInWithOAuth({
+      provider: "google",
+      options: { redirectTo: `${window.location.origin}/auth/callback` },
+    });
+  };
+
+  if (submitted) {
+    return (
+      <div className="min-h-screen bg-canvas-bg flex items-center justify-center p-4">
+        <Card className="w-full max-w-sm p-8 text-center space-y-4">
+          <Heading as="h3">Verify your email</Heading>
+          <Body size="base">
+            We sent a confirmation link to{" "}
+            <span className="font-semibold">{email}</span>
+          </Body>
+          <Body size="meta" className="text-text-secondary">
+            Didn't get it? Check your spam folder.
+          </Body>
+          <div className="pt-2">
+            <Button
+              type="button"
+              variant="outline"
+              className="w-full"
+              onClick={handleGoogleSignIn}
+            >
+              Continue with Google
+            </Button>
+          </div>
+          <Body size="meta">
+            <Link href="/auth/login" className="text-brand-accent font-semibold hover:underline">
+              Back to login
+            </Link>
+          </Body>
+        </Card>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-canvas-bg flex items-center justify-center p-4">
@@ -97,6 +130,24 @@ export default function SignupPage() {
             {loading ? "Creating account..." : "Create account"}
           </Button>
         </form>
+
+        <div className="relative my-4">
+          <div className="absolute inset-0 flex items-center">
+            <div className="w-full border-t border-border" />
+          </div>
+          <div className="relative flex justify-center text-xs">
+            <Meta className="bg-canvas-bg px-2">or continue with</Meta>
+          </div>
+        </div>
+
+        <Button
+          type="button"
+          variant="outline"
+          className="w-full"
+          onClick={handleGoogleSignIn}
+        >
+          Continue with Google
+        </Button>
 
         <Body size="meta" className="text-center mt-4">
           Already have an account?{" "}

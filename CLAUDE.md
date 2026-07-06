@@ -89,6 +89,64 @@ All the analytics queries work because the question bank is **relational** — a
 
 ---
 
+## Auth System (Complete)
+
+### Roles
+- **USER** — default role on signup (email/password or Google)
+- **ADMIN** — set manually via SQL (`UPDATE profiles SET role='ADMIN' WHERE ...`)
+
+### Auth Flows
+```
+Email signup:
+  /auth/signup → supabase.auth.signUp() + emailRedirectTo
+               → Trigger auto-creates profile row
+               → "Check your email" UI shown
+               → User clicks confirmation link → /auth/callback → exchangeCodeForSession()
+
+Google OAuth:
+  /auth/signup or /auth/login → "Continue with Google" button
+                              → supabase.auth.signInWithOAuth({ provider: "google" })
+                              → Google sign-in → Supabase creates user (auto-confirmed)
+                              → Trigger auto-creates profile with avatar_url
+                              → /auth/callback → exchangeCodeForSession()
+
+Login:
+  /auth/login → supabase.auth.signInWithPassword()
+              → If unconfirmed email: "Check your email for a confirmation link"
+              → If confirmed: session set → redirect to ?redirectTo or /
+
+Admin guard:
+  middleware.ts → checks session + profile.role === 'ADMIN'
+  verifyAdmin() → double-check in server components
+```
+
+### Files
+- `src/app/auth/signup/page.tsx` — email + Google signup, check-email success UI
+- `src/app/auth/login/page.tsx` — email + Google login, confirmation error message
+- `src/app/auth/callback/route.ts` — handles code exchange for both flows
+- `src/lib/auth/context.tsx` — client-side AuthProvider with `user`, `role`, `loading`, `signOut`
+- `src/lib/admin/guard.ts` — server-side admin verification
+- `src/middleware.ts` — Edge-level session + role check
+- `database/migrations/001_profiles.sql` — profiles table + auto-create trigger
+
+---
+
+## Environment
+
+```
+frontend/.env.local:
+  NEXT_PUBLIC_SUPABASE_URL = https://dfmkzlinmjbsqetzxpdt.supabase.co
+  NEXT_PUBLIC_SUPABASE_ANON_KEY = ...
+  SUPABASE_SERVICE_ROLE_KEY = ...
+  GROQ_API_KEY = ...
+  NEXT_PUBLIC_APP_URL = https://cuetpioneer.vercel.app
+
+Vercel (Settings → Environment Variables):
+  Same vars as above
+```
+
+---
+
 ## Admin CMS (Phase 1 — Complete)
 
 ```
@@ -102,25 +160,11 @@ src/app/(admin)/admin/media/page.tsx ─── Placeholder
 src/app/(admin)/admin/settings/page.tsx ─── Placeholder
 ```
 
-Auth flow: Middleware (session + role) → Layout (verifyAdmin double-check)
-
----
-
-## Environment (fixed)
-
-```
-frontend/.env.local:
-  NEXT_PUBLIC_SUPABASE_URL = https://dfmkzlinmjbsqetzxpdt.supabase.co
-  NEXT_PUBLIC_SUPABASE_ANON_KEY = eyJhbG...
-  SUPABASE_SERVICE_ROLE_KEY = eyJhbG...
-```
-
 ---
 
 ## Next Steps
 
-1. Run `database/schema.sql` in Supabase SQL Editor (if not done)
-2. Run `database/migrations/001_profiles.sql`
-3. Create an admin user via SQL
-4. Run `database/migrations/002_user_ecosystem.sql` when ready for subscriptions + analytics
-5. Enable Google OAuth in Supabase dashboard
+1. Run `database/migrations/002_user_ecosystem.sql` for subscriptions + analytics (when ready)
+2. Build Question Bank CRUD in `/admin/questions`
+3. Build Import page in `/admin/imports` (DOCX parser)
+4. Enable Google OAuth in Supabase dashboard (already done ✅)

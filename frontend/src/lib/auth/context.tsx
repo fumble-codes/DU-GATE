@@ -7,20 +7,20 @@ import type { User } from "@supabase/supabase-js";
 interface AuthContextValue {
   user: User | null;
   loading: boolean;
-  isTeacher: boolean;
+  role: string | null;
   signOut: () => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextValue>({
   user: null,
   loading: true,
-  isTeacher: false,
+  role: null,
   signOut: async () => {},
 });
 
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
-  const [isTeacher, setIsTeacher] = useState(false);
+  const [role, setRole] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
   const supabase = createClient();
 
@@ -31,10 +31,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       if (session?.user) {
         const { data: profile } = await supabase
           .from("profiles")
-          .select("is_teacher")
+          .select("role")
           .eq("id", session.user.id)
           .single();
-        setIsTeacher(!!profile?.is_teacher);
+        setRole(profile?.role ?? null);
       }
       setLoading(false);
     };
@@ -46,12 +46,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       if (session?.user) {
         const { data: profile } = await supabase
           .from("profiles")
-          .select("is_teacher")
+          .select("role")
           .eq("id", session.user.id)
           .single();
-        setIsTeacher(!!profile?.is_teacher);
+        setRole(profile?.role ?? null);
       } else {
-        setIsTeacher(false);
+        setRole(null);
       }
     });
 
@@ -61,11 +61,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const signOut = async () => {
     await supabase.auth.signOut();
     setUser(null);
-    setIsTeacher(false);
+    setRole(null);
   };
 
   return (
-    <AuthContext.Provider value={{ user, loading, isTeacher, signOut }}>
+    <AuthContext.Provider value={{ user, loading, role, signOut }}>
       {children}
     </AuthContext.Provider>
   );
