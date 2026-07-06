@@ -32,7 +32,13 @@ export async function middleware(request: NextRequest) {
     },
   });
 
-  const { data: { session } } = await supabase.auth.getSession();
+  let session = null;
+  try {
+    const result = await supabase.auth.getSession();
+    session = result.data.session;
+  } catch {
+    session = null;
+  }
 
   const isProtected = protectedPaths.some(p => pathname.startsWith(p));
   const isAuth = authPaths.some(p => pathname.startsWith(p));
