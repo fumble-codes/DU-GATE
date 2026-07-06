@@ -12,7 +12,6 @@ export default function LandingPage() {
       <NavBar />
       <main>
         <HeroSection />
-        <FeatureAnchorRow />
         <SplitFeatureSection />
         <PricingSection />
         <TrustSection />

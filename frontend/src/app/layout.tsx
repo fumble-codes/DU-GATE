@@ -14,7 +14,10 @@ export const metadata: Metadata = {
   title: "DUGATE - CUET Exam Preparation",
   description:
     "Comprehensive CUET exam preparation platform with mock tests, PYQ bank, chapter practice, and performance analysis.",
-  icons: [{ rel: "icon", url: "/logo.svg" }],
+  icons: [
+    { rel: "icon", url: "/logo.svg" },
+    { rel: "apple-touch-icon", url: "/logo.svg" },
+  ],
 };
 
 export default function RootLayout({

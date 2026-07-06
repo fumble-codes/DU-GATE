@@ -1,3 +1,6 @@
+"use client";
+
+import { useState } from "react";
 import { AppLayout } from "@/components/layout/app-layout";
 import { Card } from "@/components/ui/card";
 import { Heading, Body, Meta, Label } from "@/components/ui/typography";
@@ -10,7 +13,26 @@ import {
   Sparkle,
 } from "@phosphor-icons/react/dist/ssr";
 
+const subjects = ["Accountancy", "Economics", "Business Studies", "English"] as const;
+
 export default function CollegePredictorPage() {
+  const [scores, setScores] = useState<Record<string, number>>(
+    Object.fromEntries(subjects.map((s) => [s, 0]))
+  );
+
+  function updateScore(subject: string, value: number) {
+    setScores((prev) => ({ ...prev, [subject]: Math.max(0, Math.min(250, value)) }));
+  }
+
+  const total = Object.values(scores).reduce((a, b) => a + b, 0);
+
+  const subjectMeta = [
+    { subject: "Accountancy", icon: "A" },
+    { subject: "Economics", icon: "E" },
+    { subject: "Business Studies", icon: "B" },
+    { subject: "English", icon: "En" },
+  ];
+
   return (
     <AppLayout>
       <div className="space-y-8">
@@ -37,12 +59,7 @@ export default function CollegePredictorPage() {
               </div>
 
               <div className="space-y-5">
-                {[
-                  { subject: "Accountancy", icon: "A" },
-                  { subject: "Economics", icon: "E" },
-                  { subject: "Business Studies", icon: "B" },
-                  { subject: "English", icon: "En" },
-                ].map(({ subject, icon }) => (
+                {subjectMeta.map(({ subject, icon }) => (
                   <div key={subject} className="space-y-2">
                     <div className="flex items-center justify-between">
                       <div className="flex items-center gap-2">
@@ -54,7 +71,10 @@ export default function CollegePredictorPage() {
                       <div className="flex items-center gap-1">
                         <input
                           type="number"
-                          defaultValue={0}
+                          min={0}
+                          max={250}
+                          value={scores[subject]}
+                          onChange={(e) => updateScore(subject, Number(e.target.value))}
                           className="w-16 text-right rounded-[6px] border border-border px-2 py-1 text-[13px] font-semibold bg-surface-card text-text-primary focus:outline-none focus:ring-2 focus:ring-brand-accent/20"
                         />
                         <Body size="meta" muted>/ 250</Body>
@@ -64,7 +84,8 @@ export default function CollegePredictorPage() {
                       type="range"
                       min={0}
                       max={250}
-                      defaultValue={0}
+                      value={scores[subject]}
+                      onChange={(e) => updateScore(subject, Number(e.target.value))}
                       className="w-full h-2 rounded-full bg-text-primary/5 appearance-none cursor-pointer accent-brand-accent [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:size-4 [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:bg-brand-accent [&::-webkit-slider-thumb]:shadow-card-hover [&::-webkit-slider-thumb]:cursor-pointer"
                     />
                   </div>
@@ -74,7 +95,7 @@ export default function CollegePredictorPage() {
               <div className="flex items-center justify-between pt-5 border-t border-border">
                 <div>
                   <Meta>Total Score</Meta>
-                  <Heading as="h2">0 / 1000</Heading>
+                  <Heading as="h2">{total} / 1000</Heading>
                 </div>
                 <Button variant="accent">
                   <Buildings size={16} weight="fill" />

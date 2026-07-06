@@ -91,11 +91,14 @@ const FEATURES = [
 // UI 0: Mock Tests (Screenshot mocktestui.png)
 function UI0() {
   return (
-    <div className="w-full h-full bg-canvas-bg select-none">
+    <div
+      className="select-none flex items-center justify-center"
+      style={{ position: "absolute", inset: 0, background: "#FFFFFF", overflow: "hidden" }}
+    >
       <img
         src="/images/mocktestui.png"
         alt="Mock Test Interface"
-        className="w-full h-full object-cover object-top"
+        style={{ width: "100%", height: "100%", objectFit: "contain", objectPosition: "center", display: "block" }}
       />
     </div>
   );
@@ -113,7 +116,10 @@ function UI1() {
   }, []);
 
   return (
-    <div className="w-full h-full flex flex-col bg-canvas-bg p-4 gap-4 select-none" style={{ fontFamily: "inherit" }}>
+    <div
+      className="flex flex-col select-none"
+      style={{ position: "absolute", inset: 0, background: "#FAFAFA", overflow: "hidden", padding: "16px", gap: "16px", fontFamily: "inherit" }}
+    >
       {/* 3D Flashcard Wrapper */}
       <div className="relative w-full shrink-0" style={{ height: "180px", perspective: "1000px" }}>
         <div
@@ -200,11 +206,14 @@ function UI1() {
 // UI 2: Performance Analysis (Screenshot analaysisui.png)
 function UI2() {
   return (
-    <div className="w-full h-full bg-canvas-bg select-none">
+    <div
+      className="select-none flex items-center justify-center"
+      style={{ position: "absolute", inset: 0, background: "#FFFFFF", overflow: "hidden" }}
+    >
       <img
         src="/images/analaysisui.png"
         alt="Performance Analysis"
-        className="w-full h-full object-cover object-top"
+        style={{ width: "100%", height: "100%", objectFit: "contain", objectPosition: "center", display: "block" }}
       />
     </div>
   );
@@ -213,11 +222,14 @@ function UI2() {
 // UI 3: College Predictor (Screenshot collegepredictorui.png)
 function UI3() {
   return (
-    <div className="w-full h-full bg-canvas-bg select-none">
+    <div
+      className="select-none flex items-center justify-center"
+      style={{ position: "absolute", inset: 0, background: "#FFFFFF", overflow: "hidden" }}
+    >
       <img
         src="/images/collegepredictorui.png"
         alt="College Predictor"
-        className="w-full h-full object-cover object-top"
+        style={{ width: "100%", height: "100%", objectFit: "contain", objectPosition: "center", display: "block" }}
       />
     </div>
   );
@@ -226,11 +238,14 @@ function UI3() {
 // UI 4: Instant AI Doubt Solver (Screenshot aidoubtui.png)
 function UI4() {
   return (
-    <div className="w-full h-full bg-canvas-bg select-none">
+    <div
+      className="select-none flex items-center justify-center"
+      style={{ position: "absolute", inset: 0, background: "#FFFFFF", overflow: "hidden" }}
+    >
       <img
         src="/images/aidoubtui.png"
         alt="AI Doubt Solver"
-        className="w-full h-full object-cover object-top"
+        style={{ width: "100%", height: "100%", objectFit: "contain", objectPosition: "center", display: "block" }}
       />
     </div>
   );
@@ -245,7 +260,10 @@ function UI5() {
     ["# pyqs-share", false]
   ];
   return (
-    <div className="w-full h-full flex bg-canvas-bg text-text-primary" style={{ fontFamily: "inherit" }}>
+    <div
+      className="flex"
+      style={{ position: "absolute", inset: 0, background: "var(--color-canvas-bg)", color: "var(--color-text-primary)", fontFamily: "inherit", overflow: "hidden" }}
+    >
       {/* Channels Sidebar */}
       <div className="border-r border-border bg-surface-elevated p-3 flex flex-col gap-3 shrink-0 select-none" style={{ width: "110px" }}>
         <div className="flex items-center justify-between">
@@ -477,7 +495,7 @@ export function SplitFeatureSection() {
       ref={sectionRef}
       className="relative w-full bg-canvas-bg text-text-primary py-24 overflow-visible"
     >
-      <div className="max-w-6xl mx-auto px-6 relative z-10">
+      <div className="mx-auto px-6 relative z-10" style={{ maxWidth: "1500px" }}>
         {/* ── Section Header ── */}
         <div className="max-w-3xl mx-auto text-center mb-24">
           <span
@@ -496,9 +514,9 @@ export function SplitFeatureSection() {
         {/* ── Split Scroll Layout ── */}
         <div ref={triggerRef} className="relative w-full">
           {/* Desktop Pinned Scroll View */}
-          <div className="hidden lg:flex gap-16 items-start">
+          <div className="hidden lg:flex gap-8 items-start w-full">
             {/* Left side: scrolling text cards */}
-            <div className="flex flex-col relative" style={{ width: "45%", gap: "35vh", paddingTop: "15vh", paddingBottom: "15vh", paddingLeft: "24px" }}>
+            <div className="flex flex-col relative shrink-0" style={{ width: "calc(35% - 16px)", gap: "35vh", paddingTop: "15vh", paddingBottom: "15vh", paddingLeft: "24px" }}>
               {/* Vertical timeline track line */}
               <div className="absolute top-0 bottom-0 w-[2px] bg-border" style={{ left: "29px" }} />
 
@@ -552,16 +570,16 @@ export function SplitFeatureSection() {
             </div>
 
             {/* Right side: sticky visualization box */}
-            <div className="flex justify-end" style={{ width: "55%" }}>
+            <div className="flex justify-end shrink-0" style={{ width: "calc(65% - 16px)" }}>
               <div
                 ref={rightPanelRef}
                 className="w-full relative shrink-0"
-                style={{ maxWidth: "624px", height: "500px" }}
+                style={{ height: "530px" }}
               >
                 {/* Browser Frame */}
                 <div
                   className="w-full rounded-[24px] overflow-hidden flex flex-col border border-border shadow-elevated bg-surface-card"
-                  style={{ height: "500px" }}
+                  style={{ height: "530px" }}
                 >
                   {/* Mock Browser Header */}
                   <div
