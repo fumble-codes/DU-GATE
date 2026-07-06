@@ -40,10 +40,14 @@ export default function SignupPage() {
   };
 
   const handleGoogleSignIn = async () => {
-    await supabase.auth.signInWithOAuth({
+    setLoading(true);
+    setError("");
+    const { error } = await supabase.auth.signInWithOAuth({
       provider: "google",
       options: { redirectTo: `${window.location.origin}/auth/callback` },
     });
+    if (error) setError(error.message);
+    setLoading(false);
   };
 
   if (submitted) {

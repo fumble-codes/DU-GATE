@@ -66,9 +66,9 @@ Vercel Dashboard currently has these vars (added ~42m ago):
 
 | Var Name | Value |
 |----------|-------|
-| `NEXT_PUBLIC_SUPABASE_URL` | `https://dfmkzlinmjbsqetzxpdt.supabase.co` |
-| `NEXT_PUBLIC_SUPABASE_ANON_KEY` | `eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImRmbWt6bGlubWpic3FldHp4cGR0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODI5MDMzODEsImV4cCI6MjA5ODQ3OTM4MX0.diOMOWmmku0dNYcQN5nRzflx5DMKNgfcZYyulxEAvyY` |
-| `SUPABASE_SERVICE_ROLE_KEY` | `eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImRmbWt6bGlubWpic3FldHp4cGR0Iiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc4MjkwMzM4MSwiZXhwIjoyMDk4NDc5MzgxfQ.S2pt5rkYf5MacO0yWkH0ty_ejpi23mSZgdDbx2PbmO4` |
+| `NEXT_PUBLIC_SUPABASE_URL` | Supabase project URL (from `.env.local`) |
+| `NEXT_PUBLIC_SUPABASE_ANON_KEY` | Anon/public key (from `.env.local`) |
+| `SUPABASE_SERVICE_ROLE_KEY` | Service role key (from `.env.local` — **rotate immediately, was leaked in git**) |
 
 ### 8. Supabase URL config
 

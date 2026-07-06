@@ -22,7 +22,7 @@ import {
   Lightbulb,
   Rocket,
 } from "@phosphor-icons/react/dist/ssr";
-import { getSession } from "@/lib/store";
+import { useAuth } from "@/lib/auth/context";
 import { useState, useEffect } from "react";
 
 const recentActivity = [
@@ -137,13 +137,10 @@ function getDaysUntil(target: Date): number {
 }
 
 export default function DashboardPage() {
-  const [username, setUsername] = useState("Priyansh");
+  const { user } = useAuth();
   const [daysLeft, setDaysLeft] = useState(0);
 
-  useEffect(() => {
-    const session = getSession();
-    if (session?.username) setUsername(session.username);
-  }, []);
+  const username = user?.user_metadata?.username || user?.user_metadata?.full_name || user?.email?.split("@")[0] || "there";
 
   useEffect(() => {
     setDaysLeft(getDaysUntil(new Date("2027-05-15")));
