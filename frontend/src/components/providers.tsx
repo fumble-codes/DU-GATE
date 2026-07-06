@@ -1,6 +1,6 @@
 "use client";
 
-import { AuthProvider } from "@/lib/auth-context";
+import { AuthProvider } from "@/lib/auth/context";
 import type { ReactNode } from "react";
 
 function hasSupabaseEnv(): boolean {

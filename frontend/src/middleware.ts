@@ -30,7 +30,9 @@ export async function middleware(request: NextRequest) {
   const isAuth = authPaths.some(p => pathname.startsWith(p));
 
   if (isProtected && !session) {
-    return NextResponse.redirect(new URL("/auth/login", request.url));
+    const loginUrl = new URL("/auth/login", request.url);
+    loginUrl.searchParams.set("redirectTo", pathname);
+    return NextResponse.redirect(loginUrl);
   }
 
   if (isProtected && session) {
