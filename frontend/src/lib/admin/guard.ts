@@ -2,11 +2,19 @@ import { redirect } from "next/navigation";
 import { createClient } from "@/lib/db/supabase-server";
 
 export async function verifyAdmin() {
-  const supabase = await createClient();
+  let supabase;
+  try {
+    supabase = await createClient();
+  } catch {
+    redirect("/auth/login");
+    return;
+  }
+
   const { data: { user } } = await supabase.auth.getUser();
 
   if (!user) {
     redirect("/auth/login");
+    return;
   }
 
   const { data: profile } = await supabase
@@ -17,6 +25,7 @@ export async function verifyAdmin() {
 
   if (!profile || profile.role !== "ADMIN") {
     redirect("/403");
+    return;
   }
 
   return { user };

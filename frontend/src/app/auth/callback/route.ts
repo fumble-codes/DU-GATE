@@ -6,29 +6,32 @@ export async function GET(request: NextRequest) {
   const code = searchParams.get("code");
   const next = searchParams.get("next") ?? "/";
 
-  if (code) {
-    const supabase = createServerClient(
-      process.env.NEXT_PUBLIC_SUPABASE_URL!,
-      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
-      {
-        cookies: {
-          getAll() {
-            return request.cookies.getAll();
-          },
-          setAll(cookiesToSet) {
-            cookiesToSet.forEach(({ name, value }) =>
-              request.cookies.set(name, value),
-            );
-          },
-        },
-      },
-    );
+  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+  const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
 
-    const { error } = await supabase.auth.exchangeCodeForSession(code);
-    if (!error) {
-      return NextResponse.redirect(`${origin}${next}`);
-    }
+  if (!code || !supabaseUrl || !supabaseAnonKey) {
+    return NextResponse.redirect(`${origin}/auth/login?error=auth_failed`);
   }
 
-  return NextResponse.redirect(`${origin}/auth/login?error=auth_failed`);
+  let response = NextResponse.redirect(`${origin}${next}`);
+
+  const supabase = createServerClient(supabaseUrl, supabaseAnonKey, {
+    cookies: {
+      getAll() {
+        return request.cookies.getAll();
+      },
+      setAll(cookiesToSet) {
+        cookiesToSet.forEach(({ name, value, options }) =>
+          response.cookies.set(name, value, options),
+        );
+      },
+    },
+  });
+
+  const { error } = await supabase.auth.exchangeCodeForSession(code);
+  if (error) {
+    response = NextResponse.redirect(`${origin}/auth/login?error=auth_failed`);
+  }
+
+  return response;
 }

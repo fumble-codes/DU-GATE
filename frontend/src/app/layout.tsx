@@ -1,7 +1,6 @@
 import type { Metadata } from "next";
 import { Plus_Jakarta_Sans } from "next/font/google";
 import "./globals.css";
-import { SeedData } from "@/components/seed-data";
 import { Providers } from "@/components/providers";
 
 const plusJakarta = Plus_Jakarta_Sans({
@@ -28,7 +27,6 @@ export default function RootLayout({
   return (
     <html lang="en" className={`${plusJakarta.variable} h-full`} suppressHydrationWarning>
       <body className="h-full">
-        <SeedData />
         <Providers>{children}</Providers>
       </body>
     </html>
