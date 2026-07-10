@@ -12,7 +12,8 @@ export default async function AdminLayout({
 }: {
   children: React.ReactNode;
 }) {
-  await verifyAdmin();
+  // Auth temporarily disabled
+  // await verifyAdmin();
 
   return (
     <div className="flex h-full bg-canvas-bg">
