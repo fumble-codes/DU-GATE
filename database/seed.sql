@@ -1,2 +1,5 @@
--- Seed data for Question Bank
--- Run after schema.sql
+-- seed.sql
+--
+-- SUPERSEDED. Seed data now lives in database/migrations/005_seed.sql
+-- (default subscription plans). Run the migrations/ set in filename
+-- order; 005_seed.sql is the final step and is idempotent.

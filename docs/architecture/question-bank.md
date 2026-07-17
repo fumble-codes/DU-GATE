@@ -1,5 +1,7 @@
 # Dugate Question Bank Database Specification v1.0
 
+> **Agent routing:** For any auth/security-related work, load [`architecture-agents.md`](./architecture-agents.md) first.
+
 > Status: Frozen
 > Purpose: Canonical specification for Dugate's Question Bank architecture.
 > Every AI agent, developer and backend service should treat this file as the source of truth.

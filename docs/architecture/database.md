@@ -1,5 +1,7 @@
 # Database Specification
 
+> **Agent routing:** For auth/security-related schema work (e.g. `profiles`, RLS, roles), load [`architecture-agents.md`](./architecture-agents.md) first.
+
 > Status: Frozen
 > Version: 1.0
 > Database: PostgreSQL (Supabase)

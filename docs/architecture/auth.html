@@ -1,0 +1,911 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>DUGATE · Auth Architecture</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+/* ════════════════════════════════════════════
+   DESIGN TOKENS (mirrors frontend/globals.css)
+   ════════════════════════════════════════════ */
+:root {
+  --canvas-bg: #FAFAFA;
+  --surface-card: #FFFFFF;
+  --surface-elevated: #F4F4F5;
+  --text-primary: #09090B;
+  --text-secondary: #27272A;
+  --text-muted: #71717A;
+  --brand-accent: #7C3AED;
+  --brand-accent-light: #A78BFA;
+  --brand-accent-dark: #5B21B6;
+  --brand-accent-subtle: rgba(124, 58, 237, 0.06);
+  --brand-pop: #FF4E88;
+  --brand-pop-light: #FF85A7;
+  --brand-pop-dark: #D01C56;
+  --brand-pop-subtle: rgba(255, 78, 136, 0.06);
+  --brand-pop-glow: rgba(255, 78, 136, 0.20);
+  --status-success: #22C55E;
+  --status-success-light: #DCFCE7;
+  --status-alert: #EF4444;
+  --status-alert-light: #FEE2E2;
+  --border: rgba(9, 9, 11, 0.08);
+  --border-hover: rgba(9, 9, 11, 0.16);
+  --font-sans: 'Plus Jakarta Sans', system-ui, sans-serif;
+  --font-mono: 'JetBrains Mono', 'SF Mono', monospace;
+  --radius-frame: 24px;
+  --radius-card: 16px;
+  --radius-filter: 10px;
+  --radius-pill: 999px;
+  --radius-sm: 8px;
+  --shadow-card: 0 1px 3px rgba(9,9,11,0.04), 0 1px 2px rgba(9,9,11,0.06);
+  --shadow-card-hover: 0 4px 12px rgba(9,9,11,0.08), 0 2px 4px rgba(9,9,11,0.04);
+  --shadow-elevated: 0 8px 24px rgba(9,9,11,0.08), 0 4px 8px rgba(9,9,11,0.04);
+  --shadow-glow: 0 0 20px rgba(255,78,136,0.15), 0 0 40px rgba(124,58,237,0.10);
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+body {
+  font-family: var(--font-sans);
+  background: var(--canvas-bg);
+  color: var(--text-primary);
+  -webkit-font-smoothing: antialiased;
+  line-height: 1.6;
+}
+
+/* ══ Layout ══ */
+.container { max-width: 1200px; margin: 0 auto; padding: 0 24px; }
+section { padding: 64px 0; border-bottom: 1px solid var(--border); }
+section:last-child { border-bottom: none; }
+.hero { padding: 80px 0 48px; text-align: center; }
+.hero h1 { font-size: 48px; font-weight: 800; letter-spacing: -0.03em; line-height: 1.05; }
+.hero p { color: var(--text-secondary); font-size: 16px; font-weight: 500; margin-top: 12px; max-width: 640px; margin-inline: auto; }
+
+/* ══ Typography ══ */
+h2 { font-size: 28px; font-weight: 800; letter-spacing: -0.02em; line-height: 1.15; margin-bottom: 6px; }
+h2 .meta { font-size: 14px; font-weight: 500; color: var(--text-muted); display: block; margin-top: 4px; letter-spacing: normal; }
+h3 { font-size: 20px; font-weight: 700; letter-spacing: -0.01em; margin-bottom: 16px; }
+h4 { font-size: 15px; font-weight: 700; margin-bottom: 8px; }
+.section-header { margin-bottom: 32px; }
+.section-header .badge-row { display: flex; gap: 8px; align-items: center; margin-bottom: 8px; }
+
+/* ══ Cards ══ */
+.card {
+  background: var(--surface-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-card);
+  padding: 24px;
+  box-shadow: var(--shadow-card);
+  transition: box-shadow 0.2s, border-color 0.2s;
+}
+.card:hover { box-shadow: var(--shadow-card-hover); border-color: var(--border-hover); }
+.card-glow { box-shadow: var(--shadow-glow); }
+.card-elevated { background: var(--surface-elevated); }
+
+/* ══ Grids ══ */
+.grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+.grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 20px; }
+.grid-4 { display: grid; grid-template-columns: 1fr 1fr 1fr 1fr; gap: 20px; }
+@media (max-width: 900px) { .grid-2, .grid-3, .grid-4 { grid-template-columns: 1fr; } }
+
+/* ══ Badges ══ */
+.badge {
+  display: inline-flex; align-items: center; gap: 5px;
+  font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em;
+  padding: 4px 10px; border-radius: var(--radius-pill);
+  font-family: var(--font-sans);
+}
+.badge-accent { background: var(--brand-accent-subtle); color: var(--brand-accent-dark); }
+.badge-pop { background: var(--brand-pop-subtle); color: var(--brand-pop-dark); }
+.badge-success { background: var(--status-success-light); color: #15803D; }
+.badge-alert { background: var(--status-alert-light); color: #DC2626; }
+.badge-neutral { background: var(--surface-elevated); color: var(--text-secondary); }
+.badge-outline { background: transparent; border: 1px solid var(--border); color: var(--text-muted); }
+
+/* ══ Status dots ══ */
+.dot { display: inline-block; width: 8px; height: 8px; border-radius: 50%; }
+.dot-success { background: var(--status-success); }
+.dot-alert { background: var(--status-alert); }
+.dot-accent { background: var(--brand-accent); }
+.dot-pop { background: var(--brand-pop); }
+.dot-muted { background: var(--text-muted); }
+
+/* ══ Buttons (for nav/index) ══ */
+.btn {
+  display: inline-flex; align-items: center; gap: 6px;
+  font-family: var(--font-sans);
+  font-size: 13px; font-weight: 700;
+  padding: 10px 20px; border-radius: var(--radius-filter);
+  border: none; cursor: pointer; text-decoration: none;
+  transition: all 0.15s;
+}
+.btn-primary { background: var(--brand-accent); color: white; }
+.btn-primary:hover { background: var(--brand-accent-dark); }
+.btn-outline { background: transparent; color: var(--text-secondary); border: 1px solid var(--border); }
+.btn-outline:hover { border-color: var(--text-muted); }
+.btn-ghost { background: transparent; color: var(--text-muted); }
+.btn-ghost:hover { color: var(--text-primary); background: var(--surface-elevated); }
+
+/* ══ Tables ══ */
+.table-wrap { overflow-x: auto; border-radius: var(--radius-card); border: 1px solid var(--border); }
+table { width: 100%; border-collapse: collapse; font-size: 13px; }
+th { text-align: left; padding: 12px 16px; font-weight: 700; font-size: 11px; text-transform: uppercase; letter-spacing: 0.06em; color: var(--text-muted); background: var(--surface-elevated); border-bottom: 1px solid var(--border); }
+td { padding: 12px 16px; border-bottom: 1px solid var(--border); vertical-align: top; }
+tr:last-child td { border-bottom: none; }
+td code { font-size: 12px; }
+
+/* ══ Code ══ */
+code, .code {
+  font-family: var(--font-mono);
+  font-size: 13px;
+  background: var(--surface-elevated);
+  padding: 2px 6px;
+  border-radius: 4px;
+  color: var(--brand-accent-dark);
+}
+pre {
+  background: var(--surface-elevated);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 16px;
+  overflow-x: auto;
+  font-size: 13px;
+  line-height: 1.5;
+  font-family: var(--font-mono);
+}
+pre .comment { color: var(--text-muted); }
+pre .keyword { color: var(--brand-accent); font-weight: 600; }
+pre .string { color: var(--status-success); }
+pre .type { color: var(--brand-pop); }
+
+/* ══ Flow Diagram (pure CSS/SVG) ══ */
+.flow { display: flex; flex-direction: column; align-items: center; gap: 0; }
+.flow-row { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; justify-content: center; }
+.flow-box {
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  padding: 14px 20px; border-radius: var(--radius-filter); border: 1px solid var(--border);
+  background: var(--surface-card); font-size: 13px; font-weight: 600;
+  text-align: center; min-width: 100px; gap: 4px;
+  box-shadow: var(--shadow-card);
+  position: relative;
+}
+.flow-box .icon { font-size: 18px; }
+.flow-box .label { font-size: 11px; font-weight: 500; color: var(--text-muted); }
+.flow-box.accent { border-color: var(--brand-accent); background: var(--brand-accent-subtle); }
+.flow-box.pop { border-color: var(--brand-pop); background: var(--brand-pop-subtle); }
+.flow-box.success { border-color: var(--status-success); background: var(--status-success-light); }
+.flow-box.alert { border-color: var(--status-alert); background: var(--status-alert-light); }
+.arrow { font-size: 18px; color: var(--text-muted); flex-shrink: 0; }
+.arrow-down { display: block; text-align: center; color: var(--text-muted); padding: 4px 0; font-size: 16px; }
+.arrow-label { font-size: 10px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.05em; }
+.flow-branch { display: flex; gap: 20px; align-items: flex-start; flex-wrap: wrap; justify-content: center; }
+
+/* ══ Decision tree ══ */
+.tree-node { position: relative; padding: 0 0 8px 20px; border-left: 2px solid var(--border); margin-left: 12px; }
+.tree-node::before { content: ''; position: absolute; left: -5px; top: 8px; width: 10px; height: 10px; border-radius: 50%; background: var(--brand-accent); }
+.tree-node.alt::before { background: var(--brand-pop); }
+.tree-node.success::before { background: var(--status-success); }
+.tree-node.alert::before { background: var(--status-alert); }
+.tree-node .decision { font-size: 13px; font-weight: 600; margin-bottom: 2px; }
+.tree-node .outcome { font-size: 12px; color: var(--text-muted); font-family: var(--font-mono); }
+.tree-children { margin-top: 8px; }
+
+/* ══ Phase progress ══ */
+.phase-list { list-style: none; }
+.phase-item {
+  display: flex; align-items: center; gap: 14px;
+  padding: 14px 16px; border-radius: var(--radius-filter);
+  border: 1px solid var(--border); margin-bottom: 8px;
+  background: var(--surface-card);
+  transition: border-color 0.2s;
+}
+.phase-item:hover { border-color: var(--border-hover); }
+.phase-marker { width: 28px; height: 28px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 13px; font-weight: 800; flex-shrink: 0; }
+.phase-done .phase-marker { background: var(--status-success-light); color: #15803D; }
+.phase-blocked .phase-marker { background: var(--status-alert-light); color: #DC2626; }
+.phase-planned .phase-marker { background: var(--surface-elevated); color: var(--text-muted); }
+.phase-inprogress .phase-marker { background: var(--brand-accent-subtle); color: var(--brand-accent); }
+.phase-info { flex: 1; }
+.phase-title { font-size: 14px; font-weight: 700; }
+.phase-desc { font-size: 12px; color: var(--text-muted); margin-top: 1px; }
+
+/* ══ Schema diagram ══ */
+.schema-table { display: inline-block; border: 1px solid var(--border); border-radius: var(--radius-card); overflow: hidden; min-width: 280px; }
+.schema-table .st-header { padding: 12px 16px; background: var(--brand-accent); color: white; font-weight: 700; font-size: 14px; font-family: var(--font-mono); }
+.schema-table .st-row { display: flex; border-top: 1px solid var(--border); padding: 8px 16px; font-size: 13px; gap: 12px; }
+.schema-table .st-row .st-name { font-family: var(--font-mono); font-weight: 600; min-width: 100px; }
+.schema-table .st-row .st-type { color: var(--text-muted); font-family: var(--font-mono); font-size: 12px; min-width: 100px; }
+.schema-table .st-row .st-desc { color: var(--text-secondary); font-size: 12px; flex: 1; }
+.schema-table .st-row.pk { background: var(--brand-accent-subtle); }
+.schema-table .st-row.fk { background: var(--brand-pop-subtle); }
+
+/* ══ Relationship arrows ══ */
+.relation { display: flex; align-items: center; gap: 8px; padding: 8px 0; font-size: 12px; color: var(--text-muted); }
+.relation .line { flex: 1; height: 1px; background: var(--border); position: relative; }
+.relation .line::after { content: '──▶'; position: absolute; right: -18px; color: var(--brand-accent); font-size: 12px; }
+
+/* ══ File map ══ */
+.file-path { font-family: var(--font-mono); font-size: 12px; color: var(--text-muted); }
+.file-role { font-size: 13px; }
+
+/* ══ Threat box ══ */
+.threat-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+@media (max-width: 700px) { .threat-grid { grid-template-columns: 1fr; } }
+.threat-card { padding: 16px; border-radius: var(--radius-sm); border-left: 3px solid var(--status-success); background: var(--surface-card); border: 1px solid var(--border); }
+.threat-card.alert { border-left-color: var(--status-alert); }
+
+/* ══ Metadata bar ══ */
+.meta-bar { display: flex; gap: 24px; flex-wrap: wrap; justify-content: center; padding: 16px 0; }
+.meta-item { display: flex; align-items: center; gap: 8px; font-size: 13px; color: var(--text-muted); font-weight: 600; }
+.meta-item .value { color: var(--text-primary); font-weight: 700; }
+
+/* ══ TOC ══ */
+.toc { background: var(--surface-card); border: 1px solid var(--border); border-radius: var(--radius-card); padding: 24px; margin-bottom: 32px; }
+.toc h3 { margin-bottom: 12px; }
+.toc ul { list-style: none; columns: 2; column-gap: 24px; }
+.toc li { margin-bottom: 4px; }
+.toc a { color: var(--text-secondary); text-decoration: none; font-size: 13px; font-weight: 600; transition: color 0.15s; }
+.toc a:hover { color: var(--brand-accent); }
+
+/* ══ Tags / chips ══ */
+.tag { display: inline-flex; font-size: 11px; font-weight: 600; padding: 2px 8px; border-radius: 4px; font-family: var(--font-mono); }
+.tag-ts { background: #3178C61A; color: #3178C6; }
+.tag-sql { background: #E38C001A; color: #E38C00; }
+.tag-oauth { background: #4285F41A; color: #4285F4; }
+
+/* ══ Animate in ══ */
+@keyframes fadeUp { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: translateY(0); } }
+.animate-in { animation: fadeUp 0.5s ease-out both; }
+.delay-1 { animation-delay: 0.1s; }
+.delay-2 { animation-delay: 0.2s; }
+.delay-3 { animation-delay: 0.3s; }
+.delay-4 { animation-delay: 0.4s; }
+
+/* ══ Horizontal separator with label ══ */
+.sep { display: flex; align-items: center; gap: 12px; padding: 8px 0; }
+.sep-line { flex: 1; height: 1px; background: var(--border); }
+.sep-label { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; color: var(--text-muted); }
+
+/* ══ SVG flow ══ */
+.svg-flow { width: 100%; max-width: 900px; margin: 0 auto; display: block; }
+</style>
+</head>
+<body>
+
+<!-- ═══════════════ HERO ═══════════════ -->
+<div class="hero container">
+  <div class="badge badge-accent" style="margin-bottom:16px">Architecture Reference v1.0</div>
+  <h1>Authentication &amp; Authorization</h1>
+  <p>DUGATE's identity layer — OAuth 2.0 + PKCE, session management via Supabase SSR, RBAC with USER/ADMIN roles, and the Next.js 16 proxy gate.</p>
+  <div class="meta-bar">
+    <div class="meta-item"><span class="dot dot-accent"></span> <span class="value">8</span> phases</div>
+    <div class="meta-item"><span class="dot dot-success"></span> <span class="value">7</span> done</div>
+    <div class="meta-item"><span class="dot dot-alert"></span> <span class="value">1</span> blocked</div>
+    <div class="meta-item"><span class="dot dot-muted"></span> <span class="value">1</span> planned</div>
+    <div class="meta-item"><span class="dot" style="background:var(--brand-accent)"></span> <span class="value">13</span> files</div>
+  </div>
+  <div style="display:flex;gap:8px;justify-content:center;margin-top:16px;flex-wrap:wrap">
+    <span class="tag tag-ts">TypeScript</span>
+    <span class="tag tag-sql">PostgreSQL</span>
+    <span class="tag tag-oauth">OAuth 2.0</span>
+    <span class="badge badge-outline">Next.js 16</span>
+    <span class="badge badge-outline">Supabase SSR</span>
+    <span class="badge badge-outline">Vercel</span>
+  </div>
+</div>
+
+<div class="container">
+
+<!-- ═══════════════ TOC ═══════════════ -->
+<div class="toc animate-in">
+  <h3>Contents</h3>
+  <ul>
+    <li><a href="#flow">1. Auth Flows</a></li>
+    <li><a href="#proxy">2. Proxy Gate</a></li>
+    <li><a href="#schema">3. Database Schema</a></li>
+    <li><a href="#roles">4. Role Propagation</a></li>
+    <li><a href="#files">5. File Map</a></li>
+    <li><a href="#config">6. Configuration</a></li>
+    <li><a href="#threats">7. Threat Model</a></li>
+    <li><a href="#phases">8. Phase Progress</a></li>
+  </ul>
+</div>
+
+<!-- ═══════════════ SECTION 1: FLOWS ═══════════════ -->
+<section id="flow" class="animate-in delay-1">
+  <div class="section-header">
+    <div class="badge-row"><span class="dot dot-accent"></span> <span class="badge badge-accent">Flow</span></div>
+    <h2>Auth Flows <span class="meta">Every pathway through the identity layer</span></h2>
+  </div>
+
+  <!-- 1a. Email login -->
+  <div class="card" style="margin-bottom:20px">
+    <h4><span class="dot dot-success" style="margin-right:8px"></span> Email + Password Login</h4>
+    <p style="font-size:13px;color:var(--text-secondary);margin-bottom:16px">
+      <code>POST /auth/login</code> — standard credential-based authentication via Supabase GoTrue.
+    </p>
+    <svg class="svg-flow" viewBox="0 0 1000 140" fill="none">
+      <defs>
+        <linearGradient id="box-accent" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#7C3AED10"/><stop offset="100%" stop-color="#7C3AED04"/></linearGradient>
+        <linearGradient id="box-white" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#FFFFFF"/><stop offset="100%" stop-color="#FAFAFA"/></linearGradient>
+        <marker id="arrow-a" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto"><path d="M0,0 L10,5 L0,10" fill="#71717A"/></marker>
+        <marker id="arrow-accent" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto"><path d="M0,0 L10,5 L0,10" fill="#7C3AED"/></marker>
+      </defs>
+      <rect x="20" y="45" width="90" height="50" rx="10" fill="url(#box-accent)" stroke="#7C3AED" stroke-width="1.5"/>
+      <text x="65" y="73" text-anchor="middle" font-family="Plus Jakarta Sans, sans-serif" font-size="13" font-weight="700" fill="#5B21B6">User</text>
+      <line x1="110" y1="70" x2="230" y2="70" stroke="#71717A" stroke-width="1.5" marker-end="url(#arrow-a)"/>
+      <text x="170" y="52" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="9" fill="#71717A">signInWithPassword</text>
+      <rect x="230" y="45" width="110" height="50" rx="10" fill="url(#box-white)" stroke="rgba(9,9,11,0.16)" stroke-width="1"/>
+      <text x="285" y="65" text-anchor="middle" font-family="Plus Jakarta Sans, sans-serif" font-size="11" font-weight="700" fill="#27272A">Login Page</text>
+      <text x="285" y="81" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="10" fill="#71717A">use client</text>
+      <line x1="340" y1="70" x2="430" y2="70" stroke="#71717A" stroke-width="1.5" marker-end="url(#arrow-a)"/>
+      <rect x="430" y="40" width="110" height="60" rx="10" fill="#3178C610" stroke="#3178C6" stroke-width="1"/>
+      <text x="485" y="62" text-anchor="middle" font-family="Plus Jakarta Sans, sans-serif" font-size="11" font-weight="700" fill="#3178C6">Supabase Auth</text>
+      <text x="485" y="80" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="10" fill="#71717A">GoTrue</text>
+      <line x1="540" y1="70" x2="640" y2="70" stroke="#71717A" stroke-width="1.5" marker-end="url(#arrow-a)"/>
+      <text x="590" y="52" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="9" fill="#71717A">HttpOnly cookies</text>
+      <rect x="640" y="45" width="90" height="50" rx="10" fill="url(#box-white)" stroke="rgba(9,9,11,0.16)" stroke-width="1"/>
+      <text x="685" y="70" text-anchor="middle" font-family="Plus Jakarta Sans, sans-serif" font-size="13" font-weight="700" fill="#27272A">Browser</text>
+      <line x1="730" y1="70" x2="830" y2="70" stroke="#7C3AED" stroke-width="1.5" marker-end="url(#arrow-accent)"/>
+      <text x="780" y="52" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="9" fill="#7C3AED">GET /dashboard</text>
+      <rect x="830" y="45" width="100" height="50" rx="10" fill="url(#box-accent)" stroke="#7C3AED" stroke-width="1.5"/>
+      <text x="880" y="65" text-anchor="middle" font-family="Plus Jakarta Sans, sans-serif" font-size="11" font-weight="700" fill="#5B21B6">Proxy Gate</text>
+      <text x="880" y="81" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="10" fill="#7C3AED">allow</text>
+    </svg>
+  </div>
+
+  <!-- 1b. Google OAuth -->
+  <div class="card" style="margin-bottom:20px">
+    <h4><span class="dot dot-accent" style="margin-right:8px"></span> Google OAuth (Authorization Code + PKCE)</h4>
+    <p style="font-size:13px;color:var(--text-secondary);margin-bottom:16px">
+      <code>signInWithOAuth({ provider:"google" })</code> — three-party handshake with PKCE verification.
+    </p>
+    <svg class="svg-flow" viewBox="0 0 1000 240" fill="none">
+      <defs>
+        <linearGradient id="box-google" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#4285F410"/><stop offset="100%" stop-color="#4285F404"/></linearGradient>
+      </defs>
+      <rect x="20" y="55" width="90" height="40" rx="8" fill="url(#box-accent)" stroke="#7C3AED" stroke-width="1"/>
+      <text x="65" y="79" text-anchor="middle" font-family="Plus Jakarta Sans, sans-serif" font-size="12" font-weight="700" fill="#5B21B6">User</text>
+      <line x1="110" y1="75" x2="190" y2="75" stroke="#71717A" stroke-width="1.2" marker-end="url(#arrow-a)"/>
+      <text x="150" y="65" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="9" fill="#71717A">click</text>
+
+      <rect x="190" y="55" width="100" height="40" rx="8" fill="url(#box-white)" stroke="rgba(9,9,11,0.16)" stroke-width="1"/>
+      <text x="240" y="79" text-anchor="middle" font-family="Plus Jakarta Sans, sans-serif" font-size="11" font-weight="700" fill="#27272A">Login Page</text>
+      <line x1="290" y1="75" x2="380" y2="75" stroke="#71717A" stroke-width="1.2" marker-end="url(#arrow-a)"/>
+      <text x="335" y="65" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="9" fill="#71717A">signInWithOAuth</text>
+
+      <rect x="380" y="50" width="100" height="50" rx="8" fill="#3178C610" stroke="#3178C6" stroke-width="1"/>
+      <text x="430" y="71" text-anchor="middle" font-family="Plus Jakarta Sans, sans-serif" font-size="11" font-weight="700" fill="#3178C6">Supabase</text>
+      <text x="430" y="86" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="9" fill="#71717A">GoTrue</text>
+      <line x1="480" y1="75" x2="560" y2="75" stroke="#71717A" stroke-width="1.2" marker-end="url(#arrow-a)"/>
+
+      <rect x="560" y="55" width="90" height="40" rx="8" fill="url(#box-google)" stroke="#4285F4" stroke-width="1"/>
+      <text x="605" y="79" text-anchor="middle" font-family="Plus Jakarta Sans, sans-serif" font-size="11" font-weight="700" fill="#4285F4">Google</text>
+      <line x1="650" y1="75" x2="730" y2="75" stroke="#71717A" stroke-width="1.2" marker-end="url(#arrow-a)"/>
+      <text x="690" y="65" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="9" fill="#71717A">consent</text>
+
+      <rect x="20" y="170" width="110" height="40" rx="8" fill="url(#box-white)" stroke="rgba(9,9,11,0.16)" stroke-width="1"/>
+      <text x="75" y="195" text-anchor="middle" font-family="Plus Jakarta Sans, sans-serif" font-size="11" font-weight="700" fill="#27272A">Browser redirect</text>
+
+      <line x1="130" y1="190" x2="200" y2="190" stroke="#7C3AED" stroke-width="1.2" marker-end="url(#arrow-accent)"/>
+      <rect x="200" y="170" width="130" height="40" rx="8" fill="url(#box-accent)" stroke="#7C3AED" stroke-width="1"/>
+      <text x="265" y="190" text-anchor="middle" font-family="Plus Jakarta Sans, sans-serif" font-size="10" font-weight="600" fill="#5B21B6">GET auth/callback</text>
+      <text x="265" y="202" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="9" fill="#7C3AED">?code=...</text>
+
+      <line x1="330" y1="190" x2="400" y2="190" stroke="#7C3AED" stroke-width="1.2" marker-end="url(#arrow-accent)"/>
+      <rect x="400" y="170" width="100" height="40" rx="8" fill="#3178C610" stroke="#3178C6" stroke-width="1"/>
+      <text x="450" y="190" text-anchor="middle" font-family="Plus Jakarta Sans, sans-serif" font-size="10" font-weight="600" fill="#3178C6">exchangeCode</text>
+      <text x="450" y="202" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="9" fill="#71717A">ForSession</text>
+
+      <line x1="500" y1="190" x2="570" y2="190" stroke="#71717A" stroke-width="1.2" marker-end="url(#arrow-a)"/>
+      <rect x="570" y="170" width="110" height="40" rx="8" fill="url(#box-white)" stroke="rgba(9,9,11,0.16)" stroke-width="1"/>
+      <text x="625" y="190" text-anchor="middle" font-family="Plus Jakarta Sans, sans-serif" font-size="10" font-weight="600" fill="#27272A">Set cookies</text>
+      <text x="625" y="202" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="9" fill="#71717A">sb-*-auth-token</text>
+
+      <line x1="680" y1="190" x2="750" y2="190" stroke="#7C3AED" stroke-width="1.2" marker-end="url(#arrow-accent)"/>
+      <rect x="750" y="170" width="100" height="40" rx="8" fill="url(#box-accent)" stroke="#7C3AED" stroke-width="1"/>
+      <text x="800" y="190" text-anchor="middle" font-family="Plus Jakarta Sans, sans-serif" font-size="10" font-weight="600" fill="#5B21B6">redirect /</text>
+      <text x="800" y="202" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="9" fill="#7C3AED">or /dashboard</text>
+
+      <path d="M430,100 L430,138 L75,138 L75,170" stroke="#71717A" stroke-width="1" stroke-dasharray="4,3" fill="none"/>
+      <text x="435" y="122" font-family="JetBrains Mono, monospace" font-size="9" fill="#71717A">?code=...</text>
+      <path d="M605,95 L605,125 L265,125 L265,170" stroke="#71717A" stroke-width="1" stroke-dasharray="4,3" fill="none"/>
+    </svg>
+  </div>
+
+  <!-- 1c. Session lifecycle -->
+  <div class="grid-3">
+    <div class="card">
+      <h4><span class="dot dot-success" style="margin-right:6px"></span> Cookie Creation</h4>
+      <p style="font-size:13px;color:var(--text-secondary)">After <code>exchangeCodeForSession</code>, Supabase sets <code>sb-*-auth-token</code> and <code>sb-*-refresh-token</code> on the response. These are <strong>HttpOnly, Secure, SameSite=Lax</strong> cookies.</p>
+    </div>
+    <div class="card">
+      <h4><span class="dot" style="background:var(--brand-accent);margin-right:6px;display:inline-block;width:8px;height:8px;border-radius:50%"></span> Server Read</h4>
+      <p style="font-size:13px;color:var(--text-secondary)"><code>proxy.ts</code> reads cookies via <code>request.cookies.getAll()</code>, passes to <code>createServerClient()</code> which calls <code>getSession()</code> → GoTrue validates the JWT.</p>
+    </div>
+    <div class="card">
+      <h4><span class="dot" style="background:var(--brand-pop);margin-right:6px;display:inline-block;width:8px;height:8px;border-radius:50%"></span> Client Sync</h4>
+      <p style="font-size:13px;color:var(--text-secondary)"><code>createBrowserClient()</code> mirrors cookies; <code>onAuthStateChange</code> fires when tokens rotate. The <code>AuthProvider</code> listens to this and updates <code>user</code> / <code>role</code> state.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════ SECTION 2: PROXY GATE ═══════════════ -->
+<section id="proxy" class="animate-in delay-2">
+  <div class="section-header">
+    <div class="badge-row"><span class="dot dot-accent"></span> <span class="badge badge-accent">Gate</span></div>
+    <h2>Proxy Gate — Decision Tree <span class="meta">src/proxy.ts (Next.js 16 proxy convention)</span></h2>
+  </div>
+
+  <div class="card" style="overflow:hidden">
+    <div style="display:flex;gap:20px;flex-wrap:wrap">
+      <div style="flex:1;min-width:280px">
+        <div style="padding:8px 16px;background:var(--brand-accent);color:white;border-radius:var(--radius-sm) var(--radius-sm) 0 0;font-size:13px;font-weight:700">Matcher config</div>
+        <pre style="border-top:none;border-radius:0 0 var(--radius-sm) var(--radius-sm)">
+<span class="keyword">export</span> <span class="keyword">const</span> config = {
+  matcher: [
+    <span class="string">"/admin/:path*"</span>,
+    <span class="string">"/dashboard/:path*"</span>,
+    <span class="string">"/auth/login"</span>,
+    <span class="string">"/auth/signup"</span>,
+  ],
+};</pre>
+      </div>
+      <div style="flex:2;min-width:360px">
+        <div style="padding:8px 16px;background:var(--text-secondary);color:white;border-radius:var(--radius-sm) var(--radius-sm) 0 0;font-size:13px;font-weight:700">Decision Tree</div>
+        <div style="padding:16px;border:1px solid var(--border);border-radius:0 0 var(--radius-sm) var(--radius-sm)">
+          <div class="tree-node" style="border-left-color:var(--brand-accent)">
+            <div class="decision"><span class="dot dot-accent" style="margin-right:6px"></span> request → proxy()</div>
+            <div class="tree-children">
+              <div class="tree-node alt">
+                <div class="decision">env vars missing?</div>
+                <div class="outcome">protected path → redirect /auth/login</div>
+                <div class="outcome">public path → NextResponse.next()</div>
+              </div>
+              <div class="tree-node">
+                <div class="decision">createServerClient() throws?</div>
+                <div class="outcome">protected → redirect /auth/login</div>
+                <div class="outcome">else → pass through</div>
+              </div>
+              <div class="tree-node success">
+                <div class="decision">getSession() → session exists?</div>
+                <div class="outcome">No + protected → redirect /auth/login?redirectTo=</div>
+                <div class="tree-children">
+                  <div class="tree-node alert">
+                    <div class="decision">Yes + /admin → profiles.role ≠ ADMIN?</div>
+                    <div class="outcome">→ redirect /403</div>
+                  </div>
+                  <div class="tree-node success">
+                    <div class="decision">Yes + /dashboard → allow ✅</div>
+                  </div>
+                </div>
+              </div>
+              <div class="tree-node">
+                <div class="decision">On /auth/login or /auth/signup + session?</div>
+                <div class="outcome">→ redirect /dashboard (already logged in)</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div style="margin-top:16px;padding:16px;background:var(--status-alert-light);border-radius:var(--radius-sm);font-size:13px;color:#DC2626">
+    <strong>⚠ Current state:</strong> proxy is a <strong>pass-through</strong> (auth disabled for demo). The full implementation above is preserved in comments. See Phase 8 in <a href="#phases" style="color:var(--brand-accent-dark)">phase progress</a> to re-enable.
+  </div>
+</section>
+
+<!-- ═══════════════ SECTION 3: DATABASE SCHEMA ═══════════════ -->
+<section id="schema" class="animate-in delay-3">
+  <div class="section-header">
+    <div class="badge-row"><span class="dot dot-success"></span> <span class="badge badge-success">Schema</span></div>
+    <h2>Database Schema <span class="meta">Two tables, one trigger — the data layer of auth</span></h2>
+  </div>
+
+  <div class="grid-2" style="align-items:start">
+    <!-- auth.users -->
+    <div>
+      <div class="schema-table" style="width:100%">
+        <div class="st-header">auth.users (Supabase-managed)</div>
+        <div class="st-row pk"><span class="st-name">id</span><span class="st-type">uuid PK</span><span class="st-desc">Primary key, referenced by profiles</span></div>
+        <div class="st-row"><span class="st-name">email</span><span class="st-type">text</span><span class="st-desc">Verified email from provider or signup</span></div>
+        <div class="st-row"><span class="st-name">raw_user_meta</span><span class="st-type">jsonb</span><span class="st-desc">Google: { full_name, name, avatar_url, email }</span></div>
+        <div class="st-row"><span class="st-name">role</span><span class="st-type">text</span><span class="st-desc">Postgres role (authenticated/anon) — NOT app role</span></div>
+      </div>
+      <div style="text-align:center;padding:12px 0">
+        <span style="font-size:24px;color:var(--brand-accent)">↑</span>
+        <div style="font-size:11px;color:var(--text-muted);font-family:var(--font-mono)">REFERENCES auth.users(id) ON DELETE CASCADE</div>
+      </div>
+    </div>
+
+    <!-- profiles -->
+    <div>
+      <div class="schema-table" style="width:100%">
+        <div class="st-header" style="background:var(--brand-pop)">profiles (app-owned)</div>
+        <div class="st-row fk"><span class="st-name">id</span><span class="st-type">uuid PK → auth.users</span><span class="st-desc">One profile per auth user; cascade delete</span></div>
+        <div class="st-row"><span class="st-name">role</span><span class="st-type">text NOT NULL</span><span class="st-desc">RBAC: 'USER' (default) or 'ADMIN'</span></div>
+        <div class="st-row"><span class="st-name">username</span><span class="st-type">text</span><span class="st-desc">Display name; seeded from OAuth metadata</span></div>
+        <div class="st-row"><span class="st-name">avatar_url</span><span class="st-type">text</span><span class="st-desc">From Google profile picture</span></div>
+        <div class="st-row"><span class="st-name">created_at</span><span class="st-type">timestamptz</span><span class="st-desc">Auto-set by DEFAULT now()</span></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Trigger -->
+  <div class="card" style="margin-top:20px">
+    <h4><span class="dot" style="background:var(--brand-accent);margin-right:8px;display:inline-block;width:8px;height:8px;border-radius:50%"></span> Auto-Profile Trigger: <code>handle_new_user()</code></h4>
+    <p style="font-size:13px;color:var(--text-secondary);margin-bottom:12px">
+      Fires <code>AFTER INSERT ON auth.users</code>. Creates the corresponding <code>profiles</code> row. <strong>SECURITY DEFINER</strong> — runs as owner, bypasses RLS. <code>SET search_path = public</code> ensures the table is found.
+    </p>
+    <div class="grid-2">
+      <pre>
+<span class="comment">-- database/migrations/001_profiles.sql</span>
+<span class="keyword">CREATE OR REPLACE FUNCTION</span> handle_new_user()
+<span class="keyword">RETURNS</span> trigger
+<span class="type">SECURITY DEFINER</span>
+<span class="type">SET</span> search_path <span class="keyword">=</span> public
+<span class="keyword">AS</span> $$
+<span class="keyword">BEGIN</span>
+  <span class="keyword">INSERT INTO</span> public.profiles (id, username, avatar_url)
+  <span class="keyword">VALUES</span> (
+    NEW.id,
+    <span class="type">COALESCE</span>(
+      NEW.raw_user_meta_data->><span class="string">'username'</span>,
+      NEW.raw_user_meta_data->><span class="string">'full_name'</span>,
+      NEW.raw_user_meta_data->><span class="string">'name'</span>,
+      <span class="string">''</span>
+    ),
+    NEW.raw_user_meta_data->><span class="string">'avatar_url'</span>
+  );
+  <span class="keyword">RETURN</span> NEW;
+<span class="keyword">END</span>;
+$$ <span class="keyword">LANGUAGE</span> plpgsql;</pre>
+      <div>
+        <div style="padding:12px;background:var(--status-success-light);border-radius:var(--radius-sm);font-size:13px;margin-bottom:12px">
+          <strong style="color:#15803D">✅ Fixed in v003</strong><br>
+          <code>SET search_path = public</code> — the root cause of the <span class="badge badge-alert">Database error saving new user</span>. Without it, the function couldn't find <code>profiles</code>.
+        </div>
+        <div style="padding:12px;background:var(--brand-accent-subtle);border-radius:var(--radius-sm);font-size:13px">
+          <strong style="color:var(--brand-accent-dark)">📋 Must run before OAuth works</strong><br>
+          Apply <code>database/migrations/003_fix_profile_trigger.sql</code> in Supabase SQL Editor.
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════ SECTION 4: ROLE PROPAGATION ═══════════════ -->
+<section id="roles" class="animate-in delay-3">
+  <div class="section-header">
+    <div class="badge-row"><span class="dot dot-pop"></span> <span class="badge badge-pop">RBAC</span></div>
+    <h2>Role Propagation <span class="meta">How a USER becomes ADMIN (and who checks)</span></h2>
+  </div>
+
+  <svg class="svg-flow" viewBox="0 0 800 200" fill="none">
+    <defs>
+      <marker id="arrow-pop" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto"><path d="M0,0 L10,5 L0,10" fill="#FF4E88"/></marker>
+    </defs>
+    <!-- Level 1: DB -->
+    <rect x="150" y="10" width="120" height="40" rx="8" fill="url(#box-white)" stroke="rgba(9,9,11,0.16)" stroke-width="1"/>
+    <text x="210" y="34" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="11" font-weight="700" fill="#27272A">auth.users.id</text>
+    <line x1="210" y1="50" x2="210" y2="70" stroke="#FF4E88" stroke-width="1.5" marker-end="url(#arrow-pop)"/>
+    <text x="215" y="63" font-family="JetBrains Mono, monospace" font-size="9" fill="#71717A">trigger</text>
+
+    <!-- Level 2: profiles -->
+    <rect x="130" y="70" width="160" height="40" rx="8" fill="url(#box-white)" stroke="#FF4E88" stroke-width="1.5"/>
+    <text x="210" y="94" text-anchor="middle" font-family="Plus Jakarta Sans, sans-serif" font-size="11" font-weight="700" fill="#D01C56">profiles</text>
+
+    <line x1="210" y1="110" x2="210" y2="130" stroke="#71717A" stroke-width="1.2"/>
+
+    <!-- Level 3: Three consumers -->
+    <rect x="30" y="130" width="140" height="50" rx="8" fill="url(#box-accent)" stroke="#7C3AED" stroke-width="1"/>
+    <text x="100" y="150" text-anchor="middle" font-family="Plus Jakarta Sans, sans-serif" font-size="11" font-weight="700" fill="#5B21B6">Proxy Gate</text>
+    <text x="100" y="166" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="9" fill="#7C3AED">/admin → check role</text>
+
+    <rect x="230" y="130" width="160" height="50" rx="8" fill="url(#box-white)" stroke="rgba(9,9,11,0.16)" stroke-width="1"/>
+    <text x="310" y="150" text-anchor="middle" font-family="Plus Jakarta Sans, sans-serif" font-size="11" font-weight="700" fill="#27272A">verifyAdmin()</text>
+    <text x="310" y="166" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="9" fill="#71717A">admin/layout.tsx</text>
+
+    <rect x="450" y="130" width="150" height="50" rx="8" fill="url(#box-white)" stroke="rgba(9,9,11,0.16)" stroke-width="1"/>
+    <text x="525" y="150" text-anchor="middle" font-family="Plus Jakarta Sans, sans-serif" font-size="11" font-weight="700" fill="#27272A">AuthProvider</text>
+    <text x="525" y="166" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="9" fill="#71717A">useAuth().role</text>
+  </svg>
+
+  <div class="grid-3" style="margin-top:12px">
+    <div class="card">
+      <span class="dot" style="background:var(--brand-accent);display:inline-block;width:10px;height:10px;border-radius:50%;margin-right:6px"></span>
+      <strong style="font-size:14px">Proxy Gate</strong>
+      <p style="font-size:12px;color:var(--text-secondary);margin-top:4px">On every <code>/admin/:path*</code> request, queries <code>profiles.role</code>. USER → <code>/403</code>. ADMIN → allow.</p>
+    </div>
+    <div class="card">
+      <span class="dot" style="background:var(--text-primary);display:inline-block;width:10px;height:10px;border-radius:50%;margin-right:6px"></span>
+      <strong style="font-size:14px">verifyAdmin()</strong>
+      <p style="font-size:12px;color:var(--text-secondary);margin-top:4px">Server component guard in <code>(admin)/layout.tsx</code>. Double-checks before rendering admin shell. Defense in depth.</p>
+    </div>
+    <div class="card">
+      <span class="dot" style="background:var(--text-muted);display:inline-block;width:10px;height:10px;border-radius:50%;margin-right:6px"></span>
+      <strong style="font-size:14px">AuthProvider</strong>
+      <p style="font-size:12px;color:var(--text-secondary);margin-top:4px">Client-side React context. Provides <code>user</code>, <code>role</code>, <code>signOut</code>. Drives UI: different nav for USER vs ADMIN.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════ SECTION 5: FILE MAP ═══════════════ -->
+<section id="files" class="animate-in delay-4">
+  <div class="section-header">
+    <div class="badge-row"><span class="dot dot-muted"></span> <span class="badge badge-neutral">Files</span></div>
+    <h2>Component &amp; File Map <span class="meta">13 files that make up the auth surface</span></h2>
+  </div>
+
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr><th style="width:200px">File</th><th>Role</th><th style="width:80px">Env</th><th style="width:60px">Phase</th></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><code>src/proxy.ts</code></td>
+          <td>Request-time authz gate (Next.js 16 proxy). Currently pass-through; real impl preserved in comments.</td>
+          <td><span class="dot dot-alert" title="disabled"></span></td>
+          <td>1</td>
+        </tr>
+        <tr>
+          <td><code>src/app/auth/login/page.tsx</code></td>
+          <td>Email/password form + Google OAuth button. Error-handled (<code>setError</code> on failure).</td>
+          <td><span class="dot dot-success" title="active"></span></td>
+          <td>3</td>
+        </tr>
+        <tr>
+          <td><code>src/app/auth/signup/page.tsx</code></td>
+          <td>Signup form + Google OAuth + "verify email" success UI. Same error handling.</td>
+          <td><span class="dot dot-success"></span></td>
+          <td>3</td>
+        </tr>
+        <tr>
+          <td><code>src/app/auth/callback/route.ts</code></td>
+          <td>OAuth/PKCE code exchange via <code>exchangeCodeForSession()</code>. Sets cookies on response.</td>
+          <td><span class="dot dot-success"></span></td>
+          <td>—</td>
+        </tr>
+        <tr>
+          <td><code>src/lib/auth/context.tsx</code></td>
+          <td>AuthProvider React context: <code>user</code>, <code>role</code>, <code>signOut</code>, <code>loading</code>. Listens to <code>onAuthStateChange</code>.</td>
+          <td><span class="dot dot-success"></span></td>
+          <td>—</td>
+        </tr>
+        <tr>
+          <td><code>src/lib/db/supabase-browser.ts</code></td>
+          <td>Browser Supabase client via <code>createBrowserClient</code>. Noop fallback if env missing.</td>
+          <td><span class="dot dot-success"></span></td>
+          <td>—</td>
+        </tr>
+        <tr>
+          <td><code>src/lib/db/supabase-server.ts</code></td>
+          <td>Server Supabase client. Throws clear error if env missing.</td>
+          <td><span class="dot dot-success"></span></td>
+          <td>—</td>
+        </tr>
+        <tr>
+          <td><code>src/lib/admin/guard.ts</code></td>
+          <td><code>verifyAdmin()</code> — server-side user + role check. Redirects to login or /403.</td>
+          <td><span class="dot dot-alert" title="disabled"></span></td>
+          <td>—</td>
+        </tr>
+        <tr>
+          <td><code>src/components/providers.tsx</code></td>
+          <td>Wraps app in AuthProvider only if Supabase env vars exist.</td>
+          <td><span class="dot dot-success"></span></td>
+          <td>—</td>
+        </tr>
+        <tr>
+          <td><code>src/app/(admin)/layout.tsx</code></td>
+          <td>Admin shell; calls <code>verifyAdmin()</code> (currently commented out).</td>
+          <td><span class="dot dot-alert" title="commented out"></span></td>
+          <td>—</td>
+        </tr>
+        <tr>
+          <td><code>src/app/403/page.tsx</code></td>
+          <td>Forbidden screen for non-admin hitting /admin.</td>
+          <td><span class="dot dot-success"></span></td>
+          <td>—</td>
+        </tr>
+        <tr>
+          <td><code>database/migrations/001_profiles.sql</code></td>
+          <td>Profiles table + auto-insert trigger (original).</td>
+          <td><span class="dot dot-success"></span></td>
+          <td>—</td>
+        </tr>
+        <tr>
+          <td><code>database/migrations/003_fix_profile_trigger.sql</code></td>
+          <td>Hardened trigger: search_path + metadata fallback. <strong>Must run on DB.</strong></td>
+          <td><span class="dot dot-alert" title="not run"></span></td>
+          <td>6</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<!-- ═══════════════ SECTION 6: CONFIG ═══════════════ -->
+<section id="config" class="animate-in delay-4">
+  <div class="section-header">
+    <div class="badge-row"><span class="dot" style="background:var(--text-muted)"></span> <span class="badge badge-outline">Config</span></div>
+    <h2>Configuration <span class="meta">Supabase, Vercel, and env vars</span></h2>
+  </div>
+
+  <div class="grid-2">
+    <div class="card">
+      <h4>Supabase Auth Settings</h4>
+      <p style="font-size:13px;color:var(--text-secondary);margin-bottom:12px">Dashboard → Authentication → URL Configuration</p>
+      <div class="table-wrap" style="border:none">
+        <table>
+          <tr><td style="font-weight:600">Site URL</td><td><code>https://cuetpioneer.vercel.app</code></td></tr>
+          <tr><td style="font-weight:600">Redirect URLs</td><td><code>https://cuetpioneer.vercel.app/auth/callback</code></td></tr>
+          <tr><td style="font-weight:600">Google provider</td><td>Client ID + Secret filled, enabled</td></tr>
+        </table>
+      </div>
+    </div>
+    <div class="card">
+      <h4>Environment Variables</h4>
+      <div class="table-wrap" style="border:none;margin-top:4px">
+        <table>
+          <tr><td><code>NEXT_PUBLIC_SUPABASE_URL</code></td><td><span class="badge badge-success" style="font-size:10px">public</span></td><td>Project URL</td></tr>
+          <tr><td><code>NEXT_PUBLIC_SUPABASE_ANON_KEY</code></td><td><span class="badge badge-success" style="font-size:10px">public</span></td><td>Anon JWT (RLS-bounded)</td></tr>
+          <tr>
+            <td><code>SUPABASE_SERVICE_ROLE_KEY</code></td>
+            <td><span class="badge badge-alert" style="font-size:10px">secret</span></td>
+            <td><span style="color:var(--status-alert)">Bypasses RLS — server only, never commit</span></td>
+          </tr>
+        </table>
+      </div>
+      <div style="margin-top:8px;padding:8px 12px;background:var(--status-alert-light);border-radius:var(--radius-sm);font-size:12px">
+        <strong>🔑 Key leak:</strong> Service role key was exposed in git. <strong>Regenerated</strong> in Supabase Dashboard. New value in <code>.env.local</code> (gitignored). Must be added to Vercel Dashboard before re-enabling auth.
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════ SECTION 7: THREAT MODEL ═══════════════ -->
+<section id="threats" class="animate-in delay-4">
+  <div class="section-header">
+    <div class="badge-row"><span class="dot dot-alert"></span> <span class="badge badge-alert">Security</span></div>
+    <h2>Threat Model <span class="meta">Every attack surface and its mitigation</span></h2>
+  </div>
+
+  <div class="threat-grid">
+    <div class="threat-card">
+      <strong style="font-size:13px">🔓 Session hijacking / XSS token theft</strong>
+      <p style="font-size:12px;color:var(--text-secondary);margin-top:4px">JWT in <strong>HttpOnly</strong> cookies (not localStorage). XSS cannot read them. Dashboard migrated off <code>getSession()</code> (localStorage) to <code>useAuth()</code>.</p>
+    </div>
+    <div class="threat-card">
+      <strong style="font-size:13px">🔄 CSRF</strong>
+      <p style="font-size:12px;color:var(--text-secondary);margin-top:4px"><code>SameSite=Lax</code> cookies. State-changing calls go through Supabase signed requests.</p>
+    </div>
+    <div class="threat-card">
+      <strong style="font-size:13px">↗️ Open redirect</strong>
+      <p style="font-size:12px;color:var(--text-secondary);margin-top:4px">Supabase registers only whitelisted Redirect URLs; <code>redirectTo</code> is origin-bound.</p>
+    </div>
+    <div class="threat-card alert">
+      <strong style="font-size:13px">⬆️ Privilege escalation (USER→ADMIN)</strong>
+      <p style="font-size:12px;color:var(--text-secondary);margin-top:4px"><code>role</code> only settable via DB / <code>profiles</code> RLS. Double-checked in proxy + guard (defense in depth).</p>
+    </div>
+    <div class="threat-card alert">
+      <strong style="font-size:13px">🔑 Service-role key leak</strong>
+      <p style="font-size:12px;color:var(--text-secondary);margin-top:4px">Regenerated. Never exposed to client. RLS still bounds anon access.</p>
+    </div>
+    <div class="threat-card">
+      <strong style="font-size:13px">💥 Brute force / rate-limit</strong>
+      <p style="font-size:12px;color:var(--text-secondary);margin-top:4px">Rely on Supabase rate-limiting. Consider CAPTCHA on signup for Phase 8 hardening.</p>
+    </div>
+    <div class="threat-card alert">
+      <strong style="font-size:13px">🐞 DB error saving new user (Google OAuth)</strong>
+      <p style="font-size:12px;color:var(--text-secondary);margin-top:4px">Trigger lacked <code>search_path</code> and metadata fallback. Fixed by <code>003_fix_profile_trigger.sql</code>. <strong>Must run on DB.</strong></p>
+    </div>
+    <div class="threat-card">
+      <strong style="font-size:13px">📝 Malformed / expired JWT</strong>
+      <p style="font-size:12px;color:var(--text-secondary);margin-top:4px">GoTrue validates signature, expiry, and claims. Treated as <code>null session</code> if invalid.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════ SECTION 8: PHASES ═══════════════ -->
+<section id="phases" class="animate-in delay-4">
+  <div class="section-header">
+    <div class="badge-row"><span class="dot dot-pop"></span> <span class="badge badge-pop">Progress</span></div>
+    <h2>Phase Progress <span class="meta">Implementation roadmap — 8 phases to production auth</span></h2>
+  </div>
+
+  <div style="display:flex;gap:8px;margin-bottom:24px;flex-wrap:wrap">
+    <div style="display:flex;align-items:center;gap:4px;font-size:12px"><span class="dot dot-success"></span> Done (7)</div>
+    <div style="display:flex;align-items:center;gap:4px;font-size:12px"><span class="dot dot-alert"></span> Blocked (1)</div>
+    <div style="display:flex;align-items:center;gap:4px;font-size:12px"><span class="dot dot-muted"></span> Planned (1)</div>
+  </div>
+
+  <div style="display:flex;gap:4px;margin-bottom:24px">
+    <div style="flex:1;height:6px;border-radius:3px;background:var(--status-success-light)"><div style="width:100%;height:100%;border-radius:3px;background:var(--status-success)"></div></div>
+    <div style="flex:1;height:6px;border-radius:3px;background:var(--status-success-light)"><div style="width:100%;height:100%;border-radius:3px;background:var(--status-success)"></div></div>
+    <div style="flex:1;height:6px;border-radius:3px;background:var(--status-success-light)"><div style="width:100%;height:100%;border-radius:3px;background:var(--status-success)"></div></div>
+    <div style="flex:1;height:6px;border-radius:3px;background:var(--status-success-light)"><div style="width:100%;height:100%;border-radius:3px;background:var(--status-success)"></div></div>
+    <div style="flex:1;height:6px;border-radius:3px;background:var(--status-success-light)"><div style="width:100%;height:100%;border-radius:3px;background:var(--status-success)"></div></div>
+    <div style="flex:1;height:6px;border-radius:3px;background:var(--status-alert-light)"><div style="width:100%;height:100%;border-radius:3px;background:var(--status-alert)"></div></div>
+    <div style="flex:1;height:6px;border-radius:3px;background:var(--status-success-light)"><div style="width:100%;height:100%;border-radius:3px;background:var(--status-success)"></div></div>
+    <div style="flex:1;height:6px;border-radius:3px;background:var(--surface-elevated)"></div>
+  </div>
+
+  <ul class="phase-list">
+    <li class="phase-item phase-done">
+      <div class="phase-marker">✓</div>
+      <div class="phase-info">
+        <div class="phase-title">1. Migrate middleware.ts → proxy.ts</div>
+        <div class="phase-desc">Next.js 16 deprecated middleware. Replaced with proxy.ts. try/catch on createServerClient. Cookie sync on setAll. /dashboard added to matcher.</div>
+      </div>
+    </li>
+    <li class="phase-item phase-done">
+      <div class="phase-marker">✓</div>
+      <div class="phase-info">
+        <div class="phase-title">2. Fix 500 MIDDLEWARE_INVOCATION_FAILED</div>
+        <div class="phase-desc">createServerClient wasn't in try/catch. Unhandled exception on bad env vars or cookie API incompatibility.</div>
+      </div>
+    </li>
+    <li class="phase-item phase-done">
+      <div class="phase-marker">✓</div>
+      <div class="phase-info">
+        <div class="phase-title">3. Fix Google OAuth silent failure</div>
+        <div class="phase-desc">handleGoogleSignIn silently swallowed errors. Added setLoading(true) + setError(error.message) + setLoading(false).</div>
+      </div>
+    </li>
+    <li class="phase-item phase-done">
+      <div class="phase-marker">✓</div>
+      <div class="phase-info">
+        <div class="phase-title">4. Dashboard: useAuth() instead of localStorage</div>
+        <div class="phase-desc">Replaced getSession() from localStorage with useAuth() from Supabase auth context. Username from user_metadata.</div>
+      </div>
+    </li>
+    <li class="phase-item phase-done">
+      <div class="phase-marker">✓</div>
+      <div class="phase-info">
+        <div class="phase-title">5. Purge leaked service role key from git</div>
+        <div class="phase-desc">SUPABASE_SERVICE_ROLE_KEY committed in STATUS.md. Regenerated key. Rebated history to remove. New key only in .env.local.</div>
+      </div>
+    </li>
+    <li class="phase-item phase-blocked">
+      <div class="phase-marker">!</div>
+      <div class="phase-info">
+        <div class="phase-title">6. Fix Google OAuth "Database error saving new user"</div>
+        <div class="phase-desc">Profile trigger lacked search_path + metadata fallback. SQL written (003_fix_profile_trigger.sql) but <strong>NOT run on DB</strong>. Run in Supabase SQL Editor.</div>
+      </div>
+    </li>
+    <li class="phase-item phase-done">
+      <div class="phase-marker">✓</div>
+      <div class="phase-info">
+        <div class="phase-title">7. Disable auth for demo</div>
+        <div class="phase-desc">proxy.ts → pass-through (impl preserved in comments). admin/layout → verifyAdmin() commented out. All routes public.</div>
+      </div>
+    </li>
+    <li class="phase-item phase-planned">
+      <div class="phase-marker">→</div>
+      <div class="phase-info">
+        <div class="phase-title">8. Re-enable auth</div>
+        <div class="phase-desc">Restore proxy.ts + verifyAdmin(). Ensure new service role key on Vercel. Verify Supabase auth settings. Run Phase 6 SQL first.</div>
+      </div>
+    </li>
+  </ul>
+</section>
+
+<!-- ═══ Footer ═══ -->
+<section style="text-align:center;padding:40px 0 60px;border:none">
+  <p style="font-size:13px;color:var(--text-muted)">
+    <span style="font-weight:700;color:var(--brand-accent)">DUGATE</span> · Auth Architecture v1.0<br>
+    Stack: Next.js 16 · Supabase SSR 0.12.0 · TypeScript · Vercel<br>
+    See also: <a href="./architecture-agents.md" style="color:var(--brand-accent)">architecture-agents.md</a> ·
+    <a href="./auth-checkpoint.md" style="color:var(--brand-accent)">auth-checkpoint.md</a> ·
+    <a href="./auth.md" style="color:var(--brand-accent)">auth.md</a>
+  </p>
+</section>
+
+</div><!-- /container -->
+</body>
+</html>
