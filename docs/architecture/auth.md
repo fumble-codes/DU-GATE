@@ -229,8 +229,8 @@ layout renders → verifyAdmin()
 ## 6. Configuration Checklist
 
 **Supabase Auth settings (Dashboard → Authentication → URL Configuration):**
-- Site URL: `https://cuetpioneer.vercel.app`
-- Redirect URLs must include: `https://cuetpioneer.vercel.app/auth/callback`
+- Site URL: `https://dugate.vercel.app`
+- Redirect URLs must include: `https://dugate.vercel.app/auth/callback`
 - Google provider: Client ID + Secret filled, enabled.
 
 **Vercel project env:**

@@ -592,7 +592,7 @@ export function SplitFeatureSection() {
                       className="flex-1 mx-3 h-6 rounded-md flex items-center px-3 gap-2 bg-surface-card border border-border"
                     >
                       <div className="w-1.5 h-1.5 rounded-full bg-green-500 shrink-0" />
-                      <span className="text-[9.5px] text-text-muted font-semibold truncate leading-none">cuetpioneer.app</span>
+                      <span className="text-[9.5px] text-text-muted font-semibold truncate leading-none">dugate.app</span>
                     </div>
                   </div>
 
@@ -670,7 +670,7 @@ export function SplitFeatureSection() {
                          className="flex-1 mx-2 h-4.5 rounded flex items-center px-2 gap-1.5 bg-surface-card border border-border"
                        >
                          <div className="w-1.5 h-1.5 rounded-full bg-green-500 shrink-0" />
-                         <span className="text-[8px] text-text-muted font-semibold truncate leading-none">cuetpioneer.app</span>
+                         <span className="text-[8px] text-text-muted font-semibold truncate leading-none">dugate.app</span>
                        </div>
                      </div>
 

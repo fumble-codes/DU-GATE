@@ -65,7 +65,7 @@
 - **Still required before production works:**
   1. Run `003_fix_profile_trigger.sql` in Supabase SQL Editor (unblocks Google OAuth).
   2. Confirm `SUPABASE_SERVICE_ROLE_KEY` is set in Vercel Dashboard (regenerated key).
-  3. Confirm Supabase Auth Site URL `https://cuetpioneer.vercel.app` + Redirect URL `https://cuetpioneer.vercel.app/auth/callback`.
+  3. Confirm Supabase Auth Site URL `https://dugate.vercel.app` + Redirect URL `https://dugate.vercel.app/auth/callback`.
   4. Deploy + test Google OAuth + email/password end-to-end.
 
 ---

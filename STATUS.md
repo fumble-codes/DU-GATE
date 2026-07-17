@@ -72,8 +72,8 @@ Vercel Dashboard currently has these vars (added ~42m ago):
 
 ### 8. Supabase URL config
 
-- Site URL must be `https://cuetpioneer.vercel.app` in Supabase Auth settings
-- Redirect URLs must include `https://cuetpioneer.vercel.app/auth/callback`
+- Site URL must be `https://dugate.vercel.app` in Supabase Auth settings
+- Redirect URLs must include `https://dugate.vercel.app/auth/callback`
 
 ### 9. Profile/SQL
 
@@ -196,7 +196,7 @@ Vercel Dashboard currently has these vars (added ~42m ago):
 
 ### P1 — Auth flow
 
-3. **Supabase URL config** — Site URL must be `https://cuetpioneer.vercel.app`, Redirect URLs must include it
+3. **Supabase URL config** — Site URL must be `https://dugate.vercel.app`, Redirect URLs must include it
 4. **Manual admin SQL** — `UPDATE profiles SET role = 'ADMIN' WHERE id = (SELECT id FROM auth.users WHERE email = 'your@email.com');`
 5. **Existing users need profile rows** — `INSERT INTO profiles (id, role) VALUES ('<auth_user_id>', 'USER');` for users created before trigger
 
