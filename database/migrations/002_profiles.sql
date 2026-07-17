@@ -30,7 +30,10 @@ CREATE TRIGGER set_profiles_updated_at
 -- SECURITY DEFINER + SET search_path = public → runs as owner, finds
 -- public.profiles reliably, and bypasses RLS (so signup cannot be blocked
 -- by the INSERT policy in 004_rls.sql).
-CREATE OR REPLACE FUNCTION handle_new_user()
+DROP TRIGGER IF EXISTS on_auth_user_created ON auth.users;
+DROP FUNCTION IF EXISTS handle_new_user() CASCADE;
+
+CREATE FUNCTION handle_new_user()
 RETURNS trigger
 LANGUAGE plpgsql
 SECURITY DEFINER
@@ -52,7 +55,6 @@ BEGIN
 END;
 $$;
 
-DROP TRIGGER IF EXISTS on_auth_user_created ON auth.users;
 CREATE TRIGGER on_auth_user_created
     AFTER INSERT ON auth.users
     FOR EACH ROW EXECUTE FUNCTION handle_new_user();

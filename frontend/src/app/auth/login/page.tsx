@@ -1,6 +1,6 @@
 "use client";
 
-import { Suspense, useState } from "react";
+import { Suspense, useState, useEffect } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { createClient } from "@/lib/db/supabase-browser";
@@ -17,6 +17,20 @@ function LoginForm() {
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
   const supabase = createClient();
+
+  useEffect(() => {
+    const urlError = searchParams.get("error");
+    if (urlError === "auth_failed") {
+      const hash = typeof window !== "undefined" ? window.location.hash : "";
+      const descMatch = hash.match(/error_description=([^&]+)/);
+      const desc = descMatch ? decodeURIComponent(descMatch[1]).replace(/\+/g, " ") : "";
+      setError(
+        desc
+          ? `Sign-in failed: ${desc}. If this is your first time, the profile may not have been created — contact support.`
+          : "Sign-in failed. Please try again or use email/password."
+      );
+    }
+  }, [searchParams]);
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
